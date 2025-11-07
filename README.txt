@@ -1,3 +1,75 @@
+# 🧩 AI Agent for Corporate Reports (`mcp_db/ai_agent/`)
+
+이 모듈은 **기업 공시 DB(reports, attachments)** 에 저장된 보고서를 기반으로  
+**RAG (Retrieval-Augmented Generation)** 을 수행하여 LLM에게 질의할 수 있도록 만든 **CLI 기반 AI Agent**입니다.
+
+> 한 줄 요약  
+> “SQLite DB에 있는 보고서를 불러와 TF-IDF / 임베딩 기반으로 검색하고,  
+> Groq 또는 Ollama 모델에게 던져서 답변을 생성하는 엔진.”
+
+---
+
+## 📁 폴더 구조
+
+| 파일 | 역할 |
+|------|------|
+| `run.py` | 실행 진입점. DB에서 문서를 읽어와 RAG 인덱스 생성 → 대화 루프 실행 |
+| `rag.py` | 문서를 chunk 단위로 자르고 TF-IDF / Semantic 인덱스를 생성 및 검색 |
+| `loaders.py` | SQLite DB에서 보고서(`reports`) 및 첨부(`report_attachments`) 로드 |
+| `chat_groq.py` | Groq API를 통해 LLM 호출 (Groq API Key 필요) |
+| `chat.py` | Ollama 모델과 연동할 때 사용 |
+| `__init__.py` | 모듈 초기화 |
+
+---
+
+## ⚙️ 주요 기능
+
+### 1️⃣ 보고서 기반 RAG 검색
+- 보고서(`report_text`) 및 첨부 문서를 불러와서 텍스트를 chunk 단위(1000자, overlap 200)로 분할합니다.  
+- TF-IDF / SentenceTransformer 임베딩 기반 검색을 수행합니다.  
+- 검색된 상위 청크를 LLM에 `[CONTEXT]`로 전달합니다.  
+
+### 2️⃣ 질문에서 자동 종목 감지
+- 질문 내의 **종목코드 또는 회사명**(`삼성전자`, `005930`)을 감지하여  
+  해당 기업의 청크만 우선 검색합니다.
+
+### 3️⃣ LLM 호출
+- Groq 또는 Ollama를 선택적으로 사용 가능합니다.  
+- Groq 모델: `llama-3.3-70b-versatile` (기본값)  
+- Ollama 모델: `mistral` (로컬 테스트용)
+
+### 4️⃣ CLI 대화 루프
+- 명령어 입력 프롬프트에서 질의 (`Q> ...`)  
+- `/exit` 또는 `exit` 입력 시 종료.
+
+---
+
+## 🚀 실행 방법
+
+```bash
+# 프로젝트 루트에서 실행
+python -m mcp_db.ai_agent.run --debug --rag-mode tfidf
+
+## 사전 확인
+.env 파일을 mcp_db/ai_agent/ 또는 프로젝트 루트에 생성하세요
+GROQ_API_KEY=your_api_key_here
+
+## 주의
+	•	.env에 API Key 저장 (절대 커밋 금지)
+	•	DB 스키마 변경 시 loaders.py 수정 필요
+	•	semantic 검색(sentence-transformers) 미설치 시 자동으로 TF-IDF만 사용
+	•	chunk_size / overlap 조정 가능 (기본 1000 / 200)
+
+🧩 실행 시 단계
+
+아래는 실제 실행 흐름 예시입니다.
+	1.	DB 경로와 모델 정보 출력
+	2.	문서 로드 (보고서 / 첨부 포함)
+	3.	RAG 인덱스 생성
+	4.	모델 준비 완료
+	5.	질의 루프 시작 (Q> 표시)
+
+
 📁 MCP_DB 프로젝트 구조 안내
 ─────────────────────────────────────────────
 DART 보고서 데이터를 자동으로 수집하고,
