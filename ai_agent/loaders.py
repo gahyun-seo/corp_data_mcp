@@ -212,4 +212,5 @@ def load_all_reports_for_stocks(
                 if include_attachments:
                     out.extend(_load_attachment_docs(conn, stock, rcept_no, limit=5))
     finally:
-        conn.
+        conn.close()
+    return out
