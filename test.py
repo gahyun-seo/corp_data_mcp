@@ -22,8 +22,7 @@ from .collectors.reports import fetch_and_save_recent
 from .collectors.financials import fetch_and_save as save_financials
 from .extractors.summary_fin import extract_summary_consolidated
 from .collectors.reports.attachments import index_attachments_for_stock
-
-
+from .extractors.balance_sheet import extract_balance_sheet
 
 # --- 환경설정 ---
 KST = timezone(timedelta(hours=9))
@@ -56,6 +55,7 @@ def load_tickers_test():
     # 최종 컬럼 정리
     return df[["stock_code", "corp_name"]].dropna()
 
+
 def run_test_pipeline(drop_tables=True, sleep_sec=0.15):
     """테스트 전용 파이프라인 (삼성/하이닉스 등 소수 티커로 빠르게)"""
     conn = get_conn(db_path=str(TEST_DB))
@@ -76,15 +76,14 @@ def run_test_pipeline(drop_tables=True, sleep_sec=0.15):
         # 2) 최근 3년 보고서(메타만) 저장
         fetch_and_save_recent(conn, stock, corp, years_back=3)
         
-        # 🟩 추가: 보고서 첨부파일 인덱싱 (최신 보고서 1건)
+        # 3) 보고서 첨부파일 인덱싱 (최신 보고서 1건)
         try:
             new_atts = index_attachments_for_stock(conn, stock_code=stock, years_back=3, max_reports=1)
             log.info(f"[TEST] attachments indexed: {stock} (+{new_atts})")
         except Exception as e:
             log.warning(f"[TEST] attachments index failed {stock}: {e}")
 
-
-        # 3) 재무(최근 3개년, CFS/OFS 모두 수집 로직은 collectors.financials에 따름)
+        # 4) 재무(최근 3개년, CFS/OFS 모두 수집 로직은 collectors.financials에 따름)
         for yr in years_to_collect:
             try:
                 save_financials(conn, stock, corp, year=yr)
@@ -93,12 +92,19 @@ def run_test_pipeline(drop_tables=True, sleep_sec=0.15):
 
         time.sleep(sleep_sec)
         
-        # 4) 최신 보고서에서 '가. 요약연결재무정보' 표 추출 → report_tables 저장
+        # 5) 최신 보고서에서 '가. 요약연결재무정보' 표 추출
         try:
             saved_rows = extract_summary_consolidated(conn, stock, corp)
             log.info(f"[TEST] summary_consolidated saved rows: {stock} -> {saved_rows}")
         except Exception as e:
             log.warning(f"[TEST] summary_consolidated extract failed {stock}: {e}")
+
+        # 6) 연결재무상태표 추출 추가
+        try:
+            saved_rows = extract_balance_sheet(conn, stock, corp)
+            log.info(f"[TEST] balance_sheet saved rows: {stock} -> {saved_rows}")
+        except Exception as e:
+            log.warning(f"[TEST] balance_sheet extract failed {stock}: {e}")
 
         time.sleep(sleep_sec)
 
@@ -108,12 +114,27 @@ def run_test_pipeline(drop_tables=True, sleep_sec=0.15):
     # 간단한 집계 출력
     conn = get_conn(db_path=str(TEST_DB))
     cur = conn.cursor()
+    
     cur.execute("SELECT COUNT(*) FROM reports")
     print("reports 전체행:", cur.fetchone()[0])
     cur.execute("SELECT COUNT(*) FROM financials")
     print("financials 전체행:", cur.fetchone()[0])
+    
+    # 추가된 테이블 확인
+    try:
+        cur.execute("SELECT COUNT(*) FROM summary_fin_raw")
+        print("summary_fin_raw 전체행:", cur.fetchone()[0])
+    except:
+        print("summary_fin_raw 테이블 없음")
+    
+    try:
+        cur.execute("SELECT COUNT(*) FROM balance_sheet_raw")
+        print("balance_sheet_raw 전체행:", cur.fetchone()[0])
+    except:
+        print("balance_sheet_raw 테이블 없음")
+    
     print("테스트 DB 경로:", TEST_DB)
     conn.close()
-
+     
 if __name__ == "__main__":
     run_test_pipeline(drop_tables=True, sleep_sec=0.1)
