@@ -65,4 +65,6 @@ class GroqChat:
                 err_detail = resp.json()
             except Exception:
                 err_detail = resp.text
-            return f"[오류] Groq API 오류 ({resp.status_code
+            return f"[오류] Groq API 오류 ({resp.status_code}): {err_detail}"
+        except Exception as e:
+            return f"[오류] Groq 호출 실패: {e}"
