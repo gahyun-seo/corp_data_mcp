@@ -27,6 +27,8 @@ from .extractors.balance_sheet import extract_balance_sheet
 from .extractors.comprehensive_income import extract_comprehensive_income
 from .extractors.equity_changes import extract_equity_changes
 from .extractors.cash_flow import extract_cash_flow
+from .extractors.notes import extract_financial_notes
+
 
 # --- 환경설정 ---
 KST = timezone(timedelta(hours=9))
@@ -131,7 +133,15 @@ def run_test_pipeline(drop_tables=True, sleep_sec=0.15):
         except Exception as e:
             log.warning(f"[TEST] cash_flow extract failed {stock}: {e}")
 
+        # 10) 연결재무제표 주석 추출
+        try:
+            saved_rows = extract_financial_notes(conn, stock, corp)
+            log.info(f"[TEST] financial_notes saved rows: {stock} -> {saved_rows}")
+        except Exception as e:
+            log.warning(f"[TEST] financial_notes extract failed {stock}: {e}")
+
         time.sleep(sleep_sec)
+
 
     log.info("[TEST] ✅ All test data collection complete.")
     conn.close()
@@ -154,7 +164,8 @@ def run_test_pipeline(drop_tables=True, sleep_sec=0.15):
         'balance_sheet_raw',
         'comprehensive_income_raw',
         'equity_changes_raw',
-        'cash_flow_raw'
+        'cash_flow_raw',
+        'financial_notes_raw'
     ]
     
     for table_name in tables_to_check:
@@ -162,6 +173,18 @@ def run_test_pipeline(drop_tables=True, sleep_sec=0.15):
             cur.execute(f"SELECT COUNT(*) FROM {table_name}")
             count = cur.fetchone()[0]
             print(f"{table_name}: {count}행")
+
+            if table_name == 'financial_notes_raw' and count > 0:
+                cur.execute("""
+                    SELECT DISTINCT note_number, note_title 
+                    FROM financial_notes_raw 
+                    ORDER BY CAST(note_number AS INTEGER)
+                """)
+                notes = cur.fetchall()
+                print(f"  - 추출된 주석: {len(notes)}개")
+                
+                for num, title in notes[:5]:  # 처음 5개만 표시
+                    print(f"    {num}. {title[:30]}...")
         except:
             print(f"{table_name}: 테이블 없음")
     
