@@ -1,0 +1,40 @@
+/* NAVBAR */
+.top-nav {
+  width: var(--content-width);
+  height: 72px;
+  background: var(--dark-grey);
+  display: flex;
+  justify-content: center;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.nav-inner {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 24px;
+}
+
+.nav-link {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+.nav-link.active,
+.nav-link:hover {
+  color: #fff;
+}

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>DartAI</title>
+    <meta name="viewport" content="width=1280" />
+
+    <!-- Pretendard CDN 예시 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/home.css" />
+  </head>
+  <body>
+    <div class="page">
+
+      <!-- 1. NAV -->
+      <header class="top-nav">
+        <div class="nav-inner">
+          <div class="logo">DartAI</div>
+          <nav class="nav-links">
+            <a href="index.html" class="nav-link active">Home</a>
+            <a href="ai_agent.html" class="nav-link">AI Agent</a>
+            <a href="finance_search.html" class="nav-link">Finance Search</a>
+            <a href="portfolio.html" class="nav-link">Portfolio Optimization</a>
+          </nav>
+        </div>
+      </header>
+
+      <!-- 2. HERO -->
+      <section id="hero" class="hero">
+        <div class="hero-inner">
+          <p class="hero-label">Automation, Transparency, Fundamentals</p>
+          <h1 class="hero-title">
+            기업 데이터 수집부터 분석까지,<br />
+            클릭 한 번으로.
+          </h1>
+          <p class="hero-sub">
+            데이터를 더 빠르게, 더 정확하게, 더 깊이 이해하다.
+          </p>
+
+          <button class="hero-btn" data-scroll-to="#agent-cards-section">
+            스크롤해서 더 알아보세요.
+          </button>
+
+          <div class="hero-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M7.29289 9.29289C7.68342 8.90237 8.31658 8.90237 8.70711 9.29289L12 12.5858L15.2929 9.29289C15.6834 8.90237 16.3166 8.90237 16.7071 9.29289C17.0976 9.68342 17.0976 10.3166 16.7071 10.7071L12.7071 14.7071C12.5196 14.8946 12.2652 15 12 15C11.7348 15 11.4804 14.8946 11.2929 14.7071L7.29289 10.7071C6.90237 10.3166 6.90237 9.68342 7.29289 9.29289Z" fill="#00D23F"/>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. 가로 스크롤 카드 -->
+      <section id="agent-cards-section" class="agent-section">
+        <h2 class="agent-title">당신의 기업 분석 에이전트, <span>DartAI.</span></h2>
+
+        <div class="agent-cards" id="agent-carousel">
+          <!-- 카드 1 -->
+          <article class="agent-card">
+            <p class="agent-label">자동화 시스템</p>
+            <h3 class="agent-card-title">
+              기업 데이터 수집부터 분석, 추천까지.<br />
+              클릭 한 번으로 자동화된 투자 인텔리전스.
+            </h3>
+            <p class="agent-card-desc">
+              DART API를 통해 공시 데이터를 실시간으로 수집하고,<br />
+              내장된 알고리즘이 이를 자동으로 정제·분석합니다.<br />
+              효율적 프런티어 기반 포트폴리오와 AI 에이전트 추천까지<br />
+              — 당신의 과정을 자동화하세요.
+            </p>
+            <button class="agent-btn" data-scroll-to="#section-1">
+              <span>자세히 알아보기</span>
+              <span class="plus-wrapper">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+                  <circle cx="16" cy="16" r="14" fill="#00D23F"/>
+                  <path d="M15.8571 7.92871L15.8571 23.7859" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M23.7857 15.8574L7.92856 15.8574" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </span>
+            </button>
+          </article>
+
+          <!-- 카드 2 -->
+          <article class="agent-card">
+            <p class="agent-label">자동화 시스템</p>
+            <h3 class="agent-card-title">
+              기업 데이터 수집부터 분석, 추천까지.<br />
+              클릭 한 번으로 자동화된 투자 인텔리전스.
+            </h3>
+            <p class="agent-card-desc">
+              DART API를 통해 공시 데이터를 실시간으로 수집하고,<br />
+              내장된 알고리즘이 이를 자동으로 정제·분석합니다.<br />
+              — 당신의 과정을 자동화하세요.
+            </p>
+            <button class="agent-btn" data-scroll-to="#section-2">
+              <span>자세히 알아보기</span>
+              <span class="plus-wrapper">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+                  <circle cx="16" cy="16" r="14" fill="#00D23F"/>
+                  <path d="M15.8571 7.92871L15.8571 23.7859" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M23.7857 15.8574L7.92856 15.8574" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </span>
+            </button>
+          </article>
+
+          <!-- 카드 3 -->
+          <article class="agent-card">
+            <p class="agent-label">자동화 시스템</p>
+            <h3 class="agent-card-title">
+              기업 데이터 수집부터 분석, 추천까지.<br />
+              클릭 한 번으로 자동화된 투자 인텔리전스.
+            </h3>
+            <p class="agent-card-desc">
+              공시부터 분석까지 연결된 자동화 파이프라인을 통해<br />
+              반복되는 리서치를 줄이고 핵심 판단에 집중하세요.
+            </p>
+            <button class="agent-btn" data-scroll-to="#section-3">
+              <span>자세히 알아보기</span>
+              <span class="plus-wrapper">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+                  <circle cx="16" cy="16" r="14" fill="#00D23F"/>
+                  <path d="M15.8571 7.92871L15.8571 23.7859" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M23.7857 15.8574L7.92856 15.8574" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </span>
+            </button>
+          </article>
+        </div>
+
+        <!-- 상태바 -->
+        <div class="agent-dots">
+          <span class="dot active"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </div>
+      </section>
+
+      <!-- 4. section-1 : 데이터는 흩어져 있어도... -->
+      <section id="section-1" class="automation-section">
+        <p class="section-label">자동화 시스템</p>
+        <h2 class="section-title">데이터는 흩어져 있어도,<br />분석은 한 곳에서.</h2>
+        <p class="section-sub">공시부터 분석까지 연결된 자동화 파이프라인</p>
+
+        <div class="automation-cards">
+          <div class="automation-card">
+            <div class="automation-card-body">
+              <h3>Data Collection.</h3>
+              <p>Dart API를 통해 기업 데이터를 자동으로 수집합니다.</p>
+            </div>
+          </div>
+          <div class="automation-card">
+            <div class="automation-card-body">
+              <h3>Normalization.</h3>
+              <p>불필요한 중복 항목을 정제하고 표준화합니다.</p>
+            </div>
+          </div>
+          <div class="automation-card">
+            <div class="automation-card-body">
+              <h3>Analysis.</h3>
+              <p>재무제표, 지표, 업종비교를 구조화해 시각화로 전달합니다.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. section-2 : Portfolio builder -->
+      <section id="section-2" class="portfolio-section">
+        <p class="section-label">Portfolio builder</p>
+        <h2 class="section-title">효율적 프런티어 기반<br />자동 비중 계산.</h2>
+        <p class="section-sub">종목 선택만으로 최적의 포트폴리오 구성</p>
+      </section>
+
+      <!-- 6. section-3 : 자동화의 핵심은 '선택'이 아니라 '판단'. 카드 3개 -->
+      <section id="section-3" class="insight-section">
+        <div class="insight-grid">
+          <article class="insight-card">
+            <div class="insight-icon">
+              <!-- 네가 준 54x54 아이콘 -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="54" height="54" viewBox="0 0 54 54" fill="none">
+                <path d="M47.25 22.5L47.25 20.25C47.25 18.1576 47.25 17.1113 47.02 16.253C46.3958 13.9236 44.5764 12.1042 42.247 11.48C41.3887 11.25 40.3424 11.25 38.25 11.25" stroke="#FB781B" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M6.75 22.5L6.75 20.25C6.75 18.1576 6.75 17.1113 6.98 16.253C7.60415 13.9236 9.4236 12.1042 11.753 11.48C12.6113 11.25 13.6576 11.25 15.75 11.25" stroke="#FB781B" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M47.25 31.5L47.25 33.75C47.25 35.8424 47.25 36.8887 47.02 37.747C46.3958 40.0764 44.5764 41.8958 42.247 42.52C41.3887 42.75 40.3424 42.75 38.25 42.75" stroke="#FB781B" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M6.75 31.5L6.75 33.75C6.75 35.8424 6.75 36.8887 6.98 37.747C7.60415 40.0764 9.4236 41.8958 11.753 42.52C12.6113 42.75 13.6576 42.75 15.75 42.75" stroke="#FB781B" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M27 33.75L27 20.25" stroke="#FB781B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M18 31.5L18 22.5" stroke="#FB781B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M36 31.5L36 22.5" stroke="#FB781B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3>자동화의 핵심은<br />‘선택’이 아니라 ‘판단’.</h3>
+            <p>
+              투자는 자동화가 아닌 ‘판단’의 영역입니다. MCP Agent는 데이터를 가공하고 최적의 옵션을 제시하지만, 최종 선택은 사용자가 스스로의 기준으로 내릴 수 있도록 돕습니다.
+            </p>
+            <a href="#" class="insight-link">더 알아보기 &gt;</a>
+          </article>
+
+          <article class="insight-card">
+            <div class="insight-icon">
+              <!-- 같은 아이콘 -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="54" height="54" viewBox="0 0 54 54" fill="none">
+                <path d="M47.25 22.5L47.25 20.25C47.25 18.1576 47.25 17.1113 47.02 16.253C46.3958 13.9236 44.5764 12.1042 42.247 11.48C41.3887 11.25 40.3424 11.25 38.25 11.25" stroke="#FB781B" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M6.75 22.5L6.75 20.25C6.75 18.1576 6.75 17.1113 6.98 16.253C7.60415 13.9236 9.4236 12.1042 11.753 11.48C12.6113 11.25 13.6576 11.25 15.75 11.25" stroke="#FB781B" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M47.25 31.5L47.25 33.75C47.25 35.8424 47.25 36.8887 47.02 37.747C46.3958 40.0764 44.5764 41.8958 42.247 42.52C41.3887 42.75 40.3424 42.75 38.25 42.75" stroke="#FB781B" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M6.75 31.5L6.75 33.75C6.75 35.8424 6.75 36.8887 6.98 37.747C7.60415 40.0764 9.4236 41.8958 11.753 42.52C12.6113 42.75 13.6576 42.75 15.75 42.75" stroke="#FB781B" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M27 33.75L27 20.25" stroke="#FB781B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M18 31.5L18 22.5" stroke="#FB781B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M36 31.5L36 22.5" stroke="#FB781B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3>자동화의 핵심은<br />‘선택’이 아니라 ‘판단’.</h3>
+            <p>투자 기준을 명시적으로 남기고 싶을 때, 에이전트는 데이터를 정리해주고 사람은 목적에 맞는 결정을 내립니다.</p>
+            <a href="#" class="insight-link">더 알아보기 &gt;</a>
+          </article>
+
+          <article class="insight-card">
+            <div class="insight-icon">
+              <!-- 같은 아이콘 -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="54" height="54" viewBox="0 0 54 54" fill="none">
+                <path d="M47.25 22.5L47.25 20.25C47.25 18.1576 47.25 17.1113 47.02 16.253C46.3958 13.9236 44.5764 12.1042 42.247 11.48C41.3887 11.25 40.3424 11.25 38.25 11.25" stroke="#FB781B" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M6.75 22.5L6.75 20.25C6.75 18.1576 6.75 17.1113 6.98 16.253C7.60415 13.9236 9.4236 12.1042 11.753 11.48C12.6113 11.25 13.6576 11.25 15.75 11.25" stroke="#FB781B" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M47.25 31.5L47.25 33.75C47.25 35.8424 47.25 36.8887 47.02 37.747C46.3958 40.0764 44.5764 41.8958 42.247 42.52C41.3887 42.75 40.3424 42.75 38.25 42.75" stroke="#FB781B" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M6.75 31.5L6.75 33.75C6.75 35.8424 6.75 36.8887 6.98 37.747C7.60415 40.0764 9.4236 41.8958 11.753 42.52C12.6113 42.75 13.6576 42.75 15.75 42.75" stroke="#FB781B" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M27 33.75L27 20.25" stroke="#FB781B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M18 31.5L18 22.5" stroke="#FB781B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M36 31.5L36 22.5" stroke="#FB781B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3>자동화의 핵심은<br />‘선택’이 아니라 ‘판단’.</h3>
+            <p>AI는 판단을 대신하지 않고, 당신이 더 깊이 이해하도록 데이터를 구조화해줍니다.</p>
+            <a href="#" class="insight-link">더 알아보기 &gt;</a>
+          </article>
+        </div>
+      </section>
+
+      <!-- 7. AI-Powered Fundamentals 배너 -->
+      <section class="ai-banner">
+        <p class="section-label right">AI-Powered Fundamentals</p>
+        <h2 class="ai-banner-title">
+          AI가 대신 판단하지 않습니다.<br />
+          당신이 더 깊이 이해할 수 있도록 돕습니다.
+        </h2>
+        <p class="ai-banner-sub">AI 기반 데이터 해석 플랫폼</p>
+      </section>
+
+      <!-- 8. 마지막 Auto Allocation 카드 3개 -->
+      <section class="allocation-section">
+        <div class="allocation-grid">
+          <article class="allocation-card">
+            <p class="allocation-label">Auto Allocation</p>
+            <h3 class="allocation-title">종목 선택만으로<br />포트폴리오 자동 비중 계산.</h3>
+            <p class="allocation-desc">
+              선택한 종목의 과거 수익률과 변동성을 분석해 최적의 비중을 자동으로 산출합니다. 복잡한 최적화는 Agent가 수행하고, 사용자는 결과만 확인합니다.
+            </p>
+            <button class="allocation-btn">
+              <span class="visually-hidden">자세히</span>
+              <span class="allocation-circle"></span>
+            </button>
+          </article>
+
+          <article class="allocation-card">
+            <p class="allocation-label">Auto Allocation</p>
+            <h3 class="allocation-title">종목 선택만으로<br />포트폴리오 자동 비중 계산.</h3>
+            <p class="allocation-desc">
+              각 기업의 재무 안정성과 업종 특성을 반영해 균형 잡힌 포트폴리오를 구성합니다.
+            </p>
+            <button class="allocation-btn">
+              <span class="visually-hidden">자세히</span>
+              <span class="allocation-circle"></span>
+            </button>
+          </article>
+
+          <article class="allocation-card">
+            <p class="allocation-label">Auto Allocation</p>
+            <h3 class="allocation-title">종목 선택만으로<br />포트폴리오 자동 비중 계산.</h3>
+            <p class="allocation-desc">
+              리밸런싱 주기를 설정해두면 변화된 지표에 맞춰 다시 계산할 수 있습니다.
+            </p>
+            <button class="allocation-btn">
+              <span class="visually-hidden">자세히</span>
+              <span class="allocation-circle"></span>
+            </button>
+          </article>
+        </div>
+      </section>
+
+    </div>
+    <script src="js/main.js"></script>
+  </body>
+</html>
