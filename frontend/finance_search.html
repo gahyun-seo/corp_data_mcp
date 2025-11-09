@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Finance Search</title>
+    <link rel="stylesheet" href="css/reset.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/finance-search.css" />
+  </head>
+  <body class="dark-body">
+    <!-- 공통 네비게이션 -->
+    <header class="top-nav">
+      <div class="nav-inner">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="ai_agent.html" class="nav-link">AI Agent</a>
+        <a href="finance_search.html" class="nav-link">Finance Search</a>
+        <a href="portfolio.html" class="nav-link">Portfolio Optimization</a>
+      </div>
+    </header>
+
+    <main class="fs-page">
+      <section class="fs-hero">
+        <p class="fs-eyebrow">
+          Dart 공시 데이터를 기반으로 기업의 fundamental을 분석합니다.
+        </p>
+        <h1 class="fs-title">기업의 재무정보를 탐색하세요.</h1>
+        <p class="fs-sub">
+          MCP Agent는 공시에서 수집된 데이터를 항목별로 정제하고,<br />
+          투자자가 한눈에 비교할 수 있도록 구조화합니다.
+        </p>
+
+        <!-- 검색 바 -->
+        <form id="fs-search-form" class="fs-search">
+          <input
+            id="fs-search-input"
+            type="text"
+            placeholder="무엇이든 검색하세요."
+            autocomplete="off"
+          />
+          <button type="submit" class="fs-search-btn">검색</button>
+        </form>
+      </section>
+
+      <!-- 아래 카드 무한 슬라이드 -->
+      <section class="fs-ticker-wrap">
+        <div class="fs-ticker" id="fs-ticker">
+          <!-- js로 카드 넣을 거라서 비워둠 -->
+        </div>
+      </section>
+    </main>
+
+    <script src="js/finance-search.js"></script>
+  </body>  
+  <script src="js/common.js"></script>
+</html>

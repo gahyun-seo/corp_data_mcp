@@ -1,0 +1,168 @@
+.chat-page {
+  width: var(--content-width);
+  background: #000;
+  min-height: 832px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 120px;
+  gap: 32px;
+}
+
+.chat-title {
+  color: #fff;
+  font-size: 36px;
+  font-weight: 700;
+  text-align: center;
+  margin: 0;
+}
+
+.chat-card {
+  width: 768px;
+  height: 424px;
+  background: #1d1d1f;
+  border-radius: 40px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  /* 위에 패딩 조금만 */
+  padding: 22px 24px 16px;
+}
+
+/* 전체 채팅이 이 안에서 스크롤됨 */
+.chat-body {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-right: 8px;
+}
+
+.user-msg {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* 오른쪽 정렬 유지 */
+}
+
+.user-bubble {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+  max-width: 520px;
+}
+
+.user-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-label {
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.user-text {
+  color: #fff;
+  font-size: 18px;
+  line-height: 1.5;
+  text-align: right;
+  padding-left: 40px; /* 살짝 들여쓰기 느낌 */
+}
+
+.user-bubble .avatar {
+  width: 27px;
+  height: 27px;
+  border-radius: 9999px;
+  background: conic-gradient(from 182deg at 51.85% 48.15%, #fb781b 0deg, #833600 153deg, #8c8c8c 232deg, #ffCAA4 360deg);
+  box-shadow: 0 4px 4px rgba(0,0,0,0.25);
+}
+
+.user-bubble .user-label {
+  font-weight: 600;
+}
+
+/* 유저 메시지 아래에 나오는 선 */
+.inline-divider {
+  border: none;
+  border-top: 1px solid #cfcfcf;
+  opacity: 0.6;
+  margin: 4px 0 6px;
+}
+
+/* MCP Agent 메시지 */
+.agent-msg {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.avatar.agent {
+  width: 27px;
+  height: 27px;
+  border-radius: 9999px;
+  background: conic-gradient(from 182deg at 51.85% 48.15%, #fb781b 0deg, #833600 153deg, #8c8c8c 232deg, #ffCAA4 360deg);
+  box-shadow: 0 4px 4px rgba(0,0,0,0.25);
+  flex: 0 0 27px;
+}
+
+.agent-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.agent-name {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.agent-text {
+  color: #fff;
+  font-size: 16px;
+  line-height: 1.5;
+  white-space: pre-line; /* 줄바꿈 유지 */
+}
+
+/* 아래 검색 바 */
+.chat-input {
+  width: 774px;
+  height: 60px;
+  background: #1d1d1f;
+  border: 0.5px solid #cfcfcf;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 10px 0 22px;
+  margin-bottom: 40px;
+}
+
+#chat-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+#chat-input::placeholder {
+  color: #cfcfcf;
+}
+
+.chat-submit {
+  width: 71px;
+  height: 29px;
+  background: #00d23f;
+  border: none;
+  border-radius: 15px;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}

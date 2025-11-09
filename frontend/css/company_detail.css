@@ -1,0 +1,463 @@
+* {
+  box-sizing: border-box;
+  font-family: "Pretendard Variable", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+}
+
+body {
+  background: #000;
+  color: #fff;
+  margin: 0;
+  min-height: 100vh;
+}
+
+.page-wrap {
+  width: 1082px;
+  margin: 0 auto;
+  padding-bottom: 80px;
+}
+
+.top-search {
+  margin-top: 30px;
+  width: 516px;
+  height: 45px;
+  background: #1d1d1f;
+  border: 0.5px solid #cfcfcf;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  margin-left: auto;
+}
+
+.top-search input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-size: 16px;
+}
+
+.top-search button {
+  background: #00d23f;
+  border: none;
+  border-radius: 15px;
+  color: #fff;
+  padding: 4px 14px 5px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.company-header {
+  margin-top: 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.company-heading {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+}
+
+.company-heading h1 {
+  font-size: 36px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.co-code {
+  font-size: 24px;
+  color: #cfcfcf;
+  font-weight: 700;
+}
+
+.as-of {
+  font-size: 16px;
+  color: #fff;
+}
+
+.summary-row {
+  margin-top: 12px;
+  border-top: 1px solid #f5f5f7;
+  border-bottom: 1px solid #f5f5f7;
+  padding: 24px 0 26px;
+  display: flex;
+  gap: 20px;
+}
+
+.price-chart {
+  width: 343px;
+  height: 221px;
+  border-radius: 30px;
+  overflow: hidden;
+}
+
+.price-chart img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.price-info {
+  margin-top: 12px;
+}
+
+.price-line {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.current-price {
+  font-size: 36px;
+  font-weight: 700;
+}
+
+.diff-label {
+  color: #fafafb;
+  font-size: 16px;
+}
+
+.price-change {
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.price-change.down {
+  color: #00d23f;
+}
+
+.price-change.up {
+  color: #fb781b;
+}
+
+.stat-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;          /* 카드 사이 간격 */
+  max-width: 420px;   /* 너무 퍼지지 않게 */
+}
+
+/* 기본 알약 모양 */
+.stat-pill {
+  width: 130px;
+  height: 43px;
+  border-radius: 30px;
+  background: #1D1D1F;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+/* 아래 두 개 (거래량, 거래대금)만 더 길게 */
+.stat-pill.wide {
+  width: 215px;   /* 필요하면 270~280으로 늘려도 됨 */
+}
+.stat-pill.medium {
+  width: 190px;   /* 필요하면 270~280으로 늘려도 됨 */
+}
+
+.stat-label {
+  color: #CFCFCF;
+  font-family: "Pretendard Variable";
+  font-size: 16px;
+  font-weight: 400;
+  line-height: normal;
+}
+
+
+/* 값 */
+.stat-value {
+  color: #FFF;
+  font-family: "Pretendard Variable";
+  font-size: 16px;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.stat-value.green {
+  color: #00D23F;
+}
+
+/* (백만) 붙는 거 오른쪽 끝에 살짝 여백주기 */
+.stat-unit {
+  color: #CFCFCF;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.investor-panel {
+  width: 315px;
+  height: 221px;
+  background: #f5f5f7;
+  border-radius: 30px;
+  padding: 22px 18px;
+  color: #000;
+}
+
+.investor-panel-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.investor-panel-top h2 {
+    font-family: "Pretendard Variable";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+  margin: 0;
+}
+
+.dropdown {
+  position: relative;
+}
+
+.dropdown-btn {
+    width: 136px;
+    height: 30px;
+    flex-shrink: 0;
+    border-radius: 20px;
+  background: #fafafb;
+  border: 0.3px solid #1d1d1f;
+  padding: 0 12px 0 12px;
+  font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  cursor: pointer;
+}
+.dropdown-btn-dark {
+    width: 210px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 20px;
+  background: #1D1D1F;
+  border: 0.3px solid #CFCFCF;
+  padding: 0 12px 0 12px;
+  color: #FAFAFB;
+  font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.dropdown-list {
+  position: absolute;
+  top: 36px;
+  right: 0;
+  background: #1d1d1f;
+  border-radius: 12px;
+  overflow: hidden;
+  display: none;
+  min-width: 140px;
+  z-index: 10;
+}
+
+.dropdown-list li {
+  padding: 8px 12px;
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.dropdown-list li:hover {
+  background: #00d23f;
+  color: #000;
+}
+
+.dropdown.open .dropdown-list {
+  display: block;
+}
+
+.investor-table {
+  width: 100%;
+  margin-top: 18px;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.investor-table th,
+.investor-table td {
+  padding: 3px 0;
+  text-align: center;
+  color: #000;
+}
+
+.investor-table th:nth-child(1),
+.investor-table td:nth-child(1) {
+  text-align: left;
+  padding-left: 2px;
+}
+
+.info-block {
+  margin-top: 28px;
+}
+
+.info-topline {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+}
+
+.info-label {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.panel-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.info-panel {
+  width: 330px;
+}
+
+.panel-body {
+  width: 100%;
+  height: 221px;
+  border-radius: 30px;
+  background: #1d1d1f;
+}
+
+.panel-title {
+  margin-top: 19px;
+  font-size: 16px;
+  width: 153px;
+    height: 29px;
+    flex-shrink: 0;
+    border-radius: 15px;
+    border: 0.3px solid var(--light-grey, #FAFAFB);
+    font-family: "Pretendard Variable";
+    background: var(--black, #000);
+    text-align: center;
+    display: flex;  
+    align-items: center;          /* 세로 가운데 */
+    justify-content: center; 
+}
+
+.finance-table-section {
+  margin-top: 50px;
+  text-align: center;
+  position: relative;
+}
+
+.finance-table-section h2 {
+  font-size: 36px;
+  font-style: normal;
+  margin-bottom: 19px;
+}
+
+.finance-desc {
+  max-width: 500px;
+  margin: 0 auto;
+  color: #cfcfcf;
+  font-size: 16px;
+}
+
+.unit {
+    text-align: right;
+  right: 0;
+  top: 16px;
+  font-size: 12px;
+}
+
+.year-row {
+  margin-top: 40px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  justify-content: center;
+}
+
+.year-chip {
+width: 153px;
+  background: #fff;
+  color: #000;
+  border-radius: 15px;
+  border: 0.3px solid #cfcfcf;
+  padding: 14px 31px;
+  font-size: 24px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.year-chip.active {
+  border: 0.3px solid #CFCFCF !important;
+  outline: none;
+}
+
+.finance-grid {
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: 200px repeat(4, 1fr);
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.metric-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.metric-btn {
+  background: #00d23f;
+  width: 153px;;
+  border: none;
+  border-radius: 30px;
+  height: 53px;
+  color: #fafafb;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.metric-pill {
+    width: 153px;
+  background: #1d1d1f;
+  border-radius: 30px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.year-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.val-pill {
+  background: #1d1d1f;
+  width: 153px;
+  border-radius: 30px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
