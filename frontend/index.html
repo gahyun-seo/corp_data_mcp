@@ -16,17 +16,14 @@
     <div class="page">
 
       <!-- 1. NAV -->
-      <header class="top-nav">
-        <div class="nav-inner">
-          <div class="logo">DartAI</div>
-          <nav class="nav-links">
-            <a href="index.html" class="nav-link active">Home</a>
-            <a href="ai_agent.html" class="nav-link">AI Agent</a>
-            <a href="finance_search.html" class="nav-link">Finance Search</a>
-            <a href="portfolio.html" class="nav-link">Portfolio Optimization</a>
-          </nav>
-        </div>
-      </header>
+    <header class="top-nav" id ="top-nav">
+      <div class="nav-inner">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="ai_agent.html" class="nav-link">AI Agent</a>
+        <a href="finance_search.html" class="nav-link">Finance Search</a>
+        <a href="portfolio.html" class="nav-link">Portfolio Optimization</a>
+      </div>
+    </header>
 
       <!-- 2. HERO -->
       <section id="hero" class="hero">
@@ -59,16 +56,16 @@
         <div class="agent-cards" id="agent-carousel">
           <!-- 카드 1 -->
           <article class="agent-card">
-            <p class="agent-label">자동화 시스템</p>
+            <p class="agent-label">Intelligent Report Assistant</p>
             <h3 class="agent-card-title">
-              기업 데이터 수집부터 분석, 추천까지.<br />
-              클릭 한 번으로 자동화된 투자 인텔리전스.
+              기업 공시부터 애널리스트 리포트까지, <br />
+              AI가 스스로 학습하는 분석 파트너.
             </h3>
             <p class="agent-card-desc">
-              DART API를 통해 공시 데이터를 실시간으로 수집하고,<br />
-              내장된 알고리즘이 이를 자동으로 정제·분석합니다.<br />
-              효율적 프런티어 기반 포트폴리오와 AI 에이전트 추천까지<br />
-              — 당신의 과정을 자동화하세요.
+              방대한 기업 데이터와 공시 자료를 AI가 직접 요약하고 분석합니다.<br />
+              투자자가 알고 싶은 핵심만 남겨, 시간 낭비 없는 효율적 리서치를 돕습니다.<br />
+              자연어 기반 질의응답으로,<br />
+              리포트와 대화하듯 정보를 탐색할 수 있습니다.
             </p>
             <button class="agent-btn" data-scroll-to="#section-1">
               <span>자세히 알아보기</span>
@@ -84,15 +81,16 @@
 
           <!-- 카드 2 -->
           <article class="agent-card">
-            <p class="agent-label">자동화 시스템</p>
+            <p class="agent-label">Real-Time Fundamental Insights</p>
             <h3 class="agent-card-title">
-              기업 데이터 수집부터 분석, 추천까지.<br />
-              클릭 한 번으로 자동화된 투자 인텔리전스.
+              공시 데이터를 기반으로 한 실시간 재무 탐색.<br />
+              클릭 한 번으로 기업들을 한눈에 비교하세요.
             </h3>
             <p class="agent-card-desc">
-              DART API를 통해 공시 데이터를 실시간으로 수집하고,<br />
-              내장된 알고리즘이 이를 자동으로 정제·분석합니다.<br />
-              — 당신의 과정을 자동화하세요.
+              Dart 공시를 비롯한 주요 재무 데이터를 통합하여,<br />
+              매출·이익·현금흐름 등 주요 지표를 시각적으로 제공합니다.<br />
+              검색 한 번으로 기업 간 펀더멘털 차이를 빠르게 파악하고,<br />
+              투자 아이디어의 출발점을 손쉽게 찾을 수 있습니다.
             </p>
             <button class="agent-btn" data-scroll-to="#section-2">
               <span>자세히 알아보기</span>
@@ -108,14 +106,16 @@
 
           <!-- 카드 3 -->
           <article class="agent-card">
-            <p class="agent-label">자동화 시스템</p>
+            <p class="agent-label">Data-Driven Investment Strategy</p>
             <h3 class="agent-card-title">
-              기업 데이터 수집부터 분석, 추천까지.<br />
-              클릭 한 번으로 자동화된 투자 인텔리전스.
+              매번 직접 리스크와 리턴 계산하세요?<br />
+              DartAI는 최적 포트폴리오를 자동으로 설계.
             </h3>
             <p class="agent-card-desc">
-              공시부터 분석까지 연결된 자동화 파이프라인을 통해<br />
-              반복되는 리서치를 줄이고 핵심 판단에 집중하세요.
+              과거 수익률, 변동성, 상관계수를 바탕으로 효율적 프런티어를 계산하고,<br />
+              목표 수익률에 맞는 자산 비중을 제안합니다.<br />
+              시뮬레이션 그래프와 리스크 분석을 통해<br />
+              객관적이고 체계적인 투자 결정을 내려보세요.
             </p>
             <button class="agent-btn" data-scroll-to="#section-3">
               <span>자세히 알아보기</span>
@@ -142,27 +142,31 @@
 
       <!-- 4. section-1 : 데이터는 흩어져 있어도... -->
       <section id="section-1" class="automation-section">
-        <p class="section-label">자동화 시스템</p>
-        <h2 class="section-title">데이터는 흩어져 있어도,<br />분석은 한 곳에서.</h2>
-        <p class="section-sub">공시부터 분석까지 연결된 자동화 파이프라인</p>
+        <p class="section-label">AI Agent</p>
+        <h2 class="section-title">AI가 대신 판단하지 않습니다.<br />당신이 더 깊이 이해할 수 있도록 돕습니다.</h2>
+        <p class="section-sub">신뢰도 높은 정보와 AI Agent의 결합</p>
 
         <div class="automation-cards">
           <div class="automation-card">
             <div class="automation-card-body">
-              <h3>Data Collection.</h3>
-              <p>Dart API를 통해 기업 데이터를 자동으로 수집합니다.</p>
+              <h3> Data Collection.</h3>
+              <p>Dart API를 통해 기업 데이터를 자동으로 수집합니다. 공시 문서에서 필요한 항목만 선별적으로 추출하고,
+반복적인 다운로드나 정리를 자동화하여 효율을 극대화합니다.</p>
             </div>
           </div>
           <div class="automation-card">
             <div class="automation-card-body">
-              <h3>Normalization.</h3>
-              <p>불필요한 중복 항목을 정제하고 표준화합니다.</p>
+              <h3>Quick Comparison</h3>
+              <p>AI가 데이터를 정리해 테이블과 코멘트로 정리합니다.
+수십 개 보고서 대신, 한 번의 질문으로 끝냅니다.</p>
             </div>
           </div>
           <div class="automation-card">
             <div class="automation-card-body">
-              <h3>Analysis.</h3>
-              <p>재무제표, 지표, 업종비교를 구조화해 시각화로 전달합니다.</p>
+              <h3>Automated Analysis.</h3>
+              <p>분기별 실적 변화, 부문별 실적 회복세 등
+시간을 많이 쓰던 분석 과정을 자동화하여
+리서치 효율을 10배 이상 높입니다.</p>
             </div>
           </div>
         </div>
@@ -175,8 +179,8 @@
         <p class="section-sub">종목 선택만으로 최적의 포트폴리오 구성</p>
       </section>
 
-      <!-- 6. section-3 : 자동화의 핵심은 '선택'이 아니라 '판단'. 카드 3개 -->
-      <section id="section-3" class="insight-section">
+      <!-- 6. 자동화의 핵심은 '선택'이 아니라 '판단'. 카드 3개 -->
+      <section  class="insight-section">
         <div class="insight-grid">
           <article class="insight-card">
             <div class="insight-icon">
@@ -191,9 +195,11 @@
                 <path d="M36 31.5L36 22.5" stroke="#FB781B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </div>
-            <h3>자동화의 핵심은<br />‘선택’이 아니라 ‘판단’.</h3>
+            <h3>효율적 프런티어로<br />최적의 비중을 계산합니다.</h3>
             <p>
-              투자는 자동화가 아닌 ‘판단’의 영역입니다. MCP Agent는 데이터를 가공하고 최적의 옵션을 제시하지만, 최종 선택은 사용자가 스스로의 기준으로 내릴 수 있도록 돕습니다.
+              수익률, 변동성, 상관관계를 종합해 효율적 프런티어를 계산하고,  
+              동일한 위험 수준에서 더 높은 수익을 기대할 수 있는  
+              최적 비중 조합을 자동으로 도출합니다.
             </p>
             <a href="#" class="insight-link">더 알아보기 &gt;</a>
           </article>
@@ -211,8 +217,12 @@
                 <path d="M36 31.5L36 22.5" stroke="#FB781B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </div>
-            <h3>자동화의 핵심은<br />‘선택’이 아니라 ‘판단’.</h3>
-            <p>투자 기준을 명시적으로 남기고 싶을 때, 에이전트는 데이터를 정리해주고 사람은 목적에 맞는 결정을 내립니다.</p>
+            <h3>리스크와 수익률의<br />균형점을 시각화합니다.</h3>
+            <p>
+              투자자는 목표 수익률을, AI는 그에 맞는 위험 수준을 제시합니다.  
+              효율적 프런티어 상의 위치를 직관적으로 보여주며,  
+              “얼마의 위험으로 얼마의 수익을 기대할 수 있는가”를 한눈에 파악할 수 있습니다.
+            </p>
             <a href="#" class="insight-link">더 알아보기 &gt;</a>
           </article>
 
@@ -229,15 +239,19 @@
                 <path d="M36 31.5L36 22.5" stroke="#FB781B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </div>
-            <h3>자동화의 핵심은<br />‘선택’이 아니라 ‘판단’.</h3>
-            <p>AI는 판단을 대신하지 않고, 당신이 더 깊이 이해하도록 데이터를 구조화해줍니다.</p>
+            <h3>데이터 수집부터 분석까지,<br />한 번의 흐름으로.</h3>
+            <p>
+              공시에서 재무 데이터를 자동으로 불러오고,  
+              포트폴리오 분석과 연결해 별도의 입력 없이  
+              투자 판단에 필요한 정보를 한 화면에서 확인할 수 있습니다.
+            </p>
             <a href="#" class="insight-link">더 알아보기 &gt;</a>
           </article>
         </div>
       </section>
 
       <!-- 7. AI-Powered Fundamentals 배너 -->
-      <section class="ai-banner">
+      <section id="section-3" class="ai-banner">
         <p class="section-label right">AI-Powered Fundamentals</p>
         <h2 class="ai-banner-title">
           AI가 대신 판단하지 않습니다.<br />
@@ -290,4 +304,5 @@
     </div>
     <script src="js/main.js"></script>
   </body>
+  <script src="js/common.js"></script>
 </html>

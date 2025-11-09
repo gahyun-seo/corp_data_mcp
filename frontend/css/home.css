@@ -1,6 +1,6 @@
 /* HERO */
 .hero {
-  width: var(--content-width);
+  width: 100%;
   height: 842px;
   background: #000;
   display: flex;
@@ -56,7 +56,7 @@
 
 /* AGENT SECTION */
 .agent-section {
-  width: var(--content-width);
+  width: 100%;
   background: #2b2b2e;
   padding: 80px 0 100px;
   display: flex;
@@ -68,7 +68,9 @@
 .agent-title {
   font-size: 36px;
   font-weight: 700;
-  text-align: center;
+  text-align: left;
+  align-self: flex-start;
+  margin-left: 120px;
 }
 
 .agent-cards {
@@ -78,6 +80,7 @@
   overflow-x: auto;
   padding: 0 60px;
   scroll-snap-type: x mandatory;
+  margin-left: 60px;
 }
 
 .agent-card {
@@ -120,24 +123,28 @@
 
 .agent-btn {
   width: 219px;
-  height: 45px;
-  border-radius: 30px;
-  border: 1px solid #fff;
-  background: transparent;
-  color: #fff;
+height: 30px;
+border-radius: 30px;
+background: var(--dark-grey, #1D1D1F);  
+color: #fff;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   gap: 10px;
   align-items: center;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
+  font-style: normal;
+  padding: 20px;
+  border: none;
+  outline: none;
 }
 
 .plus-wrapper {
   display: flex;
+  width: 24px;
+  height: 24px;
   align-items: center;
-  justify-content: center;
 }
 
 .agent-dots {
@@ -170,7 +177,7 @@
 
 /* ------------- 자동화 시스템 섹션 (section-1) ------------- */
 .automation-section {
-  width: var(--content-width);
+  width: 100%;
   background: #000;
   padding: 120px 120px 80px;
   text-align: center;
@@ -235,7 +242,7 @@
 
 /* ------------- 포트폴리오 섹션 (section-2) ------------- */
 .portfolio-section {
-  width: var(--content-width);
+  width: 100%;
   background: #000;
   padding: 80px 120px 80px;
   text-align: left;
@@ -243,7 +250,7 @@
 
 /* ------------- 인사이트 카드 섹션 (section-3) ------------- */
 .insight-section {
-  width: var(--content-width);
+  width: 100%;
   background: #1d1d1f;
   padding: 80px 80px 40px;
 }
@@ -291,7 +298,7 @@
 
 /* ------------- AI 배너 ------------- */
 .ai-banner {
-  width: var(--content-width);
+  width: 100%;
   background: #000;
   padding: 110px 116px 90px;
   position: relative;
@@ -318,7 +325,7 @@
 
 /* ------------- 마지막 Auto Allocation ------------- */
 .allocation-section {
-  width: var(--content-width);
+  width: 100%;
   background: #1d1d1f;
   padding: 50px 80px 120px;
 }
@@ -373,8 +380,8 @@
 }
 
 .allocation-circle {
-  width: 37px;
-  height: 37px;
+  width: 31px;
+  height: 31px;
   background: #00d23f;
   border-radius: 9999px;
   display: block;
