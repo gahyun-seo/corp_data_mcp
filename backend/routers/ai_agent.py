@@ -26,4 +26,4 @@ def chat(req: ChatRequest):
 @router.get("/stocks")
 def list_stocks():
     agent = get_agent()
-    return {"stocks": [{"code": c, "name": agent.code2name.get(c)} for c in agent.stocks]}
+    return {"stocks": [{"code": c, "name": agent.code2name.get(c
