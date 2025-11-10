@@ -6,7 +6,10 @@
     <meta name="viewport" content="width=1280" />
 
     <!-- Pretendard -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css"
+    />
 
     <link rel="stylesheet" href="css/base.css" />
     <link rel="stylesheet" href="css/layout.css" />
@@ -15,28 +18,23 @@
   <body>
     <div class="page">
       <!-- 공통 네비 -->
-    <header class="top-nav" id="top-nav">
-      <div class="nav-inner">
-        <a href="index.html" class="nav-link">Home</a>
-        <a href="ai_agent.html" class="nav-link">AI Agent</a>
-        <a href="finance_search.html" class="nav-link active">Finance Search</a>
-        <a href="portfolio.html" class="nav-link">Portfolio Optimization</a>
-      </div>
-    </header>
+      <header class="top-nav" id="top-nav">
+        <div class="nav-inner">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="ai_agent.html" class="nav-link">AI Agent</a>
+          <a href="finance_search.html" class="nav-link active">Finance Search</a>
+          <a href="portfolio.html" class="nav-link">Portfolio Optimization</a>
+        </div>
+      </header>
 
       <!-- 채팅 화면 -->
       <main class="chat-page">
-        <!-- 이 타이틀은 유저가 입력할 때마다 바뀜 -->
         <h1 class="chat-title" id="chat-topic">AI Agent 대화</h1>
 
         <div class="chat-card">
-          <!-- 전부 스크롤되는 영역 -->
-          <div class="chat-body" id="chat-body">
-            <!-- JS가 여기에 user → divider → agent 순서로 계속 추가함 -->
-          </div>
+          <div class="chat-body" id="chat-body"></div>
         </div>
 
-        <!-- 아래 입력창 -->
         <form id="chat-input-form" class="chat-input">
           <input
             type="text"
@@ -49,7 +47,9 @@
         </form>
       </main>
     </div>
+
+    <!-- 여기서부터 JS는 공용 것만 불러오고, 실제 채팅 로직은 main.js 3)에서 처리 -->
     <script src="js/main.js"></script>
+    <script src="js/common.js"></script>
   </body>
-  <script src="js/common.js"></script>
 </html>

@@ -16,6 +16,8 @@ import requests
 
 from ..config import dart  # 그대로 둔다
 
+import json
+
 
 try:
     from pdfminer.high_level import extract_text as pdf_extract_text
@@ -214,3 +216,251 @@ def load_all_reports_for_stocks(
     finally:
         conn.close()
     return out
+
+def _rows_to_docs_from_table(conn: sqlite3.Connection, table: str, stock_code: str) -> List[Doc]:
+    """
+    주어진 테이블에서 해당 종목의 행들을 전부 Doc으로 바꾼다.
+    테이블마다 컬럼 구성이 달라도 일단 key=value로 나열해서 텍스트를 만든다.
+    """
+    cur = conn.cursor()
+    # stock_code 컬럼 이름이 테이블마다 다를 수 있으면 여기서 조건을 바꿔야 함
+    # 일단 네가 추출 파이프라인에서 만든 raw 테이블들은 stock_code / corp_name 거의 다 있을 거라고 가정
+    try:
+        cur.execute(f"PRAGMA table_info({table})")
+        cols = [r[1] for r in cur.fetchall()]
+    except Exception:
+        return []
+
+    if "stock_code" in cols:
+        cur.execute(f"SELECT * FROM {table} WHERE stock_code = ?", (stock_code,))
+    else:
+        # stock_code 없으면 그냥 전부
+        cur.execute(f"SELECT * FROM {table}")
+
+    rows = cur.fetchall()
+    if not rows:
+        return []
+
+    docs: List[Doc] = []
+    for row in rows:
+        row_dict = {col: row[i] for i, col in enumerate(cols)}
+        corp_name = row_dict.get("corp_name") or row_dict.get("corp_nm") or None
+        # 사람이 읽기 좋게 key=value로 나열
+        parts = []
+        for k, v in row_dict.items():
+            if v is None or v == "":
+                continue
+            parts.append(f"{k}={v}")
+        text = " ; ".join(parts)
+        title = f"{corp_name or stock_code} {table} 행"
+        docs.append(
+            Doc(
+                stock_code=stock_code,
+                corp_name=corp_name,
+                rcept_no=row_dict.get("rcept_no", ""),
+                source=f"table:{table}",
+                title=title,
+                text=text,
+                section=table,
+            )
+        )
+    return docs
+
+
+def load_structured_financial_docs(
+    db_path: str,
+    stocks: List[str],
+    tables: List[str] | None = None,
+) -> List[Doc]:
+    """
+    팀원이 분리해둔 표(raw 테이블)들을 우선 RAG에 올리기 위해 불러오는 함수.
+    """
+    if tables is None:
+        tables = [
+            "summary_fin_raw",
+            "balance_sheet_raw",
+            "comprehensive_income_raw",
+            "equity_changes_raw",
+            "cash_flow_raw",
+            "financial_notes_raw",
+        ]
+
+    conn = sqlite3.connect(db_path)
+    out: List[Doc] = []
+    try:
+        for stock in stocks:
+            for tbl in tables:
+                try:
+                    out.extend(_rows_to_docs_from_table(conn, tbl, stock))
+                except Exception:
+                    # 테이블이 없거나 컬럼이 달라도 전체 파이프라인이 죽지 않게
+                    continue
+    finally:
+        conn.close()
+    return out
+
+import sqlite3
+import json
+
+import sqlite3
+import json
+
+def load_structured_financial_texts(
+    db_path: str,
+    stocks: list[str],
+    tables: list[str] | None = None,
+) -> dict[str, str]:
+    """
+    각 raw 테이블(summary_fin_raw, balance_sheet_raw, ...)을 LLM이 읽기 쉬운 텍스트로 변환한다.
+    네 DB 구조(= section_tag, row_json, 주석만 note_title 있음)에 맞춰서 작성한 버전.
+    """
+    if tables is None:
+        tables = [
+            "summary_fin_raw",
+            "balance_sheet_raw",
+            "comprehensive_income_raw",
+            "equity_changes_raw",
+            "cash_flow_raw",
+            "financial_notes_raw",
+        ]
+
+    TABLE_NAME_MAP = {
+        "summary_fin_raw": "요약연결재무정보",
+        "balance_sheet_raw": "연결재무상태표",
+        "comprehensive_income_raw": "연결포괄손익계산서",
+        "equity_changes_raw": "연결자본변동표",
+        "cash_flow_raw": "연결현금흐름표",
+        "financial_notes_raw": "재무제표주석",
+    }
+
+    conn = sqlite3.connect(db_path)
+    stock2lines: dict[str, list[str]] = {s: [] for s in stocks}
+
+    try:
+        cur = conn.cursor()
+        for tbl in tables:
+            # 테이블이 없으면 스킵
+            try:
+                cur.execute(f"SELECT 1 FROM {tbl} LIMIT 1")
+            except Exception:
+                continue
+
+            pretty_name = TABLE_NAME_MAP.get(tbl, tbl)
+
+            for stock in stocks:
+                # 주석 테이블은 note_number, note_title이 있어서 따로 SELECT
+                if tbl == "financial_notes_raw":
+                    cur.execute(
+                        f"""
+                        SELECT
+                            corp_name,
+                            rcept_no,
+                            note_number,
+                            note_title,
+                            section_tag,
+                            row_idx,
+                            row_json
+                        FROM {tbl}
+                        WHERE stock_code=?
+                        ORDER BY CAST(note_number AS INTEGER) ASC, row_idx ASC
+                        """,
+                        (stock,),
+                    )
+                    rows = cur.fetchall()
+                    if not rows:
+                        continue
+
+                    # 섹션 헤더
+                    stock2lines[stock].append(f"[표: {pretty_name}]")
+
+                    for (
+                        corp_name,
+                        rcept_no,
+                        note_number,
+                        note_title,
+                        section_tag,
+                        row_idx,
+                        row_json,
+                    ) in rows:
+                        corp = corp_name or stock
+                        section = section_tag or pretty_name
+
+                        # row_json 펼치기
+                        try:
+                            obj = json.loads(row_json)
+                            vals = []
+                            for k in sorted(obj.keys()):
+                                v = obj[k]
+                                if v is None or v == "":
+                                    continue
+                                vals.append(str(v))
+                            row_txt = " / ".join(vals)
+                        except Exception:
+                            row_txt = row_json or ""
+
+                        # 주석은 제목을 살려서
+                        title_part = ""
+                        if note_number:
+                            title_part = f"주석 {note_number}"
+                        if note_title:
+                            if title_part:
+                                title_part += f". {note_title}"
+                            else:
+                                title_part = note_title
+
+                        stock2lines[stock].append(
+                            f"{corp} | {section} | {title_part} | {rcept_no} | {row_txt}"
+                        )
+
+                else:
+                    # 나머지 일반 재무표 테이블
+                    cur.execute(
+                        f"""
+                        SELECT
+                            corp_name,
+                            rcept_no,
+                            section_tag,
+                            row_idx,
+                            row_json
+                        FROM {tbl}
+                        WHERE stock_code=?
+                        ORDER BY row_idx ASC
+                        """,
+                        (stock,),
+                    )
+                    rows = cur.fetchall()
+                    if not rows:
+                        continue
+
+                    stock2lines[stock].append(f"[표: {pretty_name}]")
+
+                    for (
+                        corp_name,
+                        rcept_no,
+                        section_tag,
+                        row_idx,
+                        row_json,
+                    ) in rows:
+                        corp = corp_name or stock
+                        section = section_tag or pretty_name
+
+                        try:
+                            obj = json.loads(row_json)
+                            vals = []
+                            for k in sorted(obj.keys()):
+                                v = obj[k]
+                                if v is None or v == "":
+                                    continue
+                                vals.append(str(v))
+                            row_txt = " / ".join(vals)
+                        except Exception:
+                            row_txt = row_json or ""
+
+                        stock2lines[stock].append(
+                            f"{corp} | {section} | {rcept_no} | {row_txt}"
+                        )
+    finally:
+        conn.close()
+
+    # 종목별 하나의 큰 문자열로
+    return {s: "\n".join(lines) for s, lines in stock2lines.items()}

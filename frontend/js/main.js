@@ -1,5 +1,16 @@
 // ======================================================
-// 1) 공통: 스무스 스크롤 (홈에서 쓰던 거)
+// 0) 공통 설정
+// ======================================================
+const API_BASE = "http://127.0.0.1:8000"; // 백엔드 주소
+
+// URL에서 파라미터 읽기
+function getQueryParam(name) {
+  const params = new URLSearchParams(window.location.search);
+  return params.get(name);
+}
+
+// ======================================================
+// 1) 공통: 스무스 스크롤
 // ======================================================
 document.addEventListener("click", (e) => {
   const trigger = e.target.closest("[data-scroll-to]");
@@ -45,13 +56,7 @@ const chatForm = document.getElementById("chat-input-form");
 const chatInput = document.getElementById("chat-input");
 const chatTitle = document.getElementById("chat-topic");
 
-// URL에서 q 파라미터 읽기
-function getQueryParam(name) {
-  const params = new URLSearchParams(window.location.search);
-  return params.get(name);
-}
-
-// 유저 메시지 추가 (오른쪽)
+// 채팅 말풍선 - 유저
 function appendUserMessage(text) {
   if (!chatBody) return;
 
@@ -61,7 +66,6 @@ function appendUserMessage(text) {
   const bubble = document.createElement("div");
   bubble.className = "user-bubble";
 
-  // 첫 줄: 아이콘 + You
   const header = document.createElement("div");
   header.className = "user-header";
 
@@ -75,7 +79,6 @@ function appendUserMessage(text) {
   header.appendChild(avatar);
   header.appendChild(label);
 
-  // 두 번째 줄: 실제 메시지
   const msg = document.createElement("div");
   msg.className = "user-text";
   msg.textContent = text;
@@ -85,7 +88,6 @@ function appendUserMessage(text) {
   wrap.appendChild(bubble);
   chatBody.appendChild(wrap);
 
-  // 구분선
   const hr = document.createElement("hr");
   hr.className = "inline-divider";
   chatBody.appendChild(hr);
@@ -93,7 +95,7 @@ function appendUserMessage(text) {
   chatBody.scrollTop = chatBody.scrollHeight;
 }
 
-// MCP Agent 메시지 추가
+// 채팅 말풍선 - 에이전트
 function appendAgentMessage(text) {
   if (!chatBody) return;
 
@@ -120,7 +122,6 @@ function appendAgentMessage(text) {
   wrap.appendChild(meta);
   chatBody.appendChild(wrap);
 
-  // 타이핑 효과
   let i = 0;
   const speed = 12;
   const timer = setInterval(() => {
@@ -131,39 +132,79 @@ function appendAgentMessage(text) {
   }, speed);
 }
 
-// 채팅 페이지일 때만 초기 메시지 찍기
+// 근거 표시 (있으면)
+function appendRefs(chunks) {
+  if (!chatBody) return;
+  if (!chunks || !chunks.length) return;
+
+  const box = document.createElement("div");
+  box.className = "agent-refs";
+  box.textContent = "📎 참고 문서:";
+
+  chunks.slice(0, 3).forEach((c) => {
+    const line = document.createElement("div");
+    line.className = "agent-ref-line";
+    line.textContent = `[${c.stock_code}] ${c.title}`;
+    box.appendChild(line);
+  });
+
+  chatBody.appendChild(box);
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+// 실제 백엔드 호출 함수
+async function sendToBackend(question) {
+  // 로딩
+  const loading = document.createElement("div");
+  loading.className = "agent-msg";
+  loading.textContent = "생각 중...";
+  chatBody.appendChild(loading);
+  chatBody.scrollTop = chatBody.scrollHeight;
+
+  try {
+    const res = await fetch(`${API_BASE}/ai/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        question,
+        top_k: 8,
+      }),
+    });
+    console.log("status:", res.status);
+    const data = await res.json();
+
+    chatBody.removeChild(loading);
+    appendAgentMessage(data.answer || "(응답이 없습니다)");
+    // appendRefs(data.chunks);
+  } catch (err) {
+    console.error("fetch error:", err);
+    chatBody.removeChild(loading);
+    appendAgentMessage("❗ 서버 요청 중 오류가 났습니다.");
+  }
+}
+
+// 채팅 페이지일 때만 작동
 if (chatBody && chatForm && chatInput) {
-  // 1) 처음 들어올 때 q가 있으면 그걸 첫 유저 메시지로
+  // 1) URL로부터 온 첫 질문
   const firstQ = getQueryParam("q") || "삼성전자 최근 분기 재무 요약";
 
-  // 유저 메시지 먼저
+  // 화면에 사용자 메시지로 찍고
   appendUserMessage(firstQ);
-
-  // 상단 타이틀도 이걸로
   if (chatTitle) chatTitle.textContent = firstQ;
 
-  // 에이전트 첫 답변
-  const dummyFirst =
-    "요청하신 항목을 요약해드릴게요.\n(데모 데이터)\n매출: 67조 4,000억 원\n영업이익: 8조 1,200억 원\n순이익: 6조 9,000억 원\n\n전년 동기 대비 매출은 약 12% 증가, 영업이익은 32% 증가했습니다.";
-  appendAgentMessage(dummyFirst);
+  // 🔥 여기! 메인 화면에서 넘어온 첫 질문을 바로 백엔드로 보냄
+  sendToBackend(firstQ);
 
-  // 2) 이후 사용자가 새로 질문 보낼 때
-  chatForm.addEventListener("submit", (e) => {
+  // 2) 이후 사용자가 직접 입력하는 경우
+  chatForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const q = chatInput.value.trim();
     if (!q) return;
 
-    // 유저 메시지 추가
     appendUserMessage(q);
-
-    // 타이틀도 이 메시지로 갱신
     if (chatTitle) chatTitle.textContent = q;
 
-    // 에이전트 답변 (나중에 fetch로 교체)
-    const answer =
-      q +
-      " 에 대한 요약을 정리해드릴게요.\n(데모) 실제 값은 백엔드 응답으로 교체됩니다.";
-    appendAgentMessage(answer);
+    await sendToBackend(q);
 
     chatInput.value = "";
   });
