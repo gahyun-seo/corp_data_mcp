@@ -119,3 +119,67 @@ class AgentState:
         # 1) 종목 결정
         if explicit_stocks:
             target_stocks = explicit_stocks
+        else:
+            guessed = self.guess_stocks_from_question(question)
+            target_stocks = guessed if guessed else self.stocks  # 하나도 못 찾으면 삼성+하이닉스 둘 다
+
+        # 2) ✅ 표 기반 컨텍스트를 종목별로 몽땅 앞에 깐다
+        structured_parts: List[str] = []
+        for s in target_stocks:
+            txt = self.structured_text_map.get(s)
+            if txt:
+                structured_parts.append(txt)
+        structured_ctx = "\n".join(structured_parts)
+
+        # 3) ✅ 보고서 RAG는 보조로만 몇 개
+        chunks: List[Chunk] = self.rag.retrieve(
+            question,
+            top_k=top_k,
+            allowed_stocks=target_stocks,
+            debug=debug,
+            retriever=self.rag_mode,
+        )
+        rag_ctx = self.rag.format_context(chunks)
+
+        # 4) ✅ LLM에는 “표 → --- → 보고서” 순서로 붙여서 보낸다
+        final_ctx = structured_ctx + "\n\n---\n\n" + rag_ctx
+
+        answer_text = self.llm.ask(
+            system=SYSTEM_PROMPT,
+            user=question,
+            context=final_ctx,
+        )
+
+        return {
+            "answer": answer_text,
+            "used_stocks": target_stocks or [],
+            "chunks": [
+                {
+                    "stock_code": c.stock_code,
+                    "title": c.title,
+                    "text_preview": c.text[:300],
+                }
+                for c in chunks
+            ],
+        }
+
+
+# 전역 싱글턴 → FastAPI에서 get_agent()만 부르면 됨
+_agent: AgentState | None = None
+
+
+def get_agent() -> AgentState:
+    global _agent
+    if _agent is None:
+        default_stocks = load_all_stock_codes(DEFAULT_DB)
+        if not default_stocks:
+            default_stocks = ["005930", "000660"]
+        _agent = AgentState(
+            db_path=DEFAULT_DB,
+            stocks=default_stocks,
+            use_all_reports=True,
+            max_reports_per_stock=3,
+            rag_mode="hybrid",
+            groq_model="llama-3.3-70b-versatile",
+        )
+    return _agent
