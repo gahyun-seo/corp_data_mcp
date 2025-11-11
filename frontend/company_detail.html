@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>기업 재무정보</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="css/company_detail.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" href="css/layout.css">
+
+  </head>
+    <!-- Pretendard Variable -->
+    <link
+      rel="stylesheet"
+      as="style"
+      crossorigin
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css"
+    />
+  </head>
+  <body>
+    <!-- 네비 -->
+    <header class="top-nav">
+      <div class="nav-inner">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="ai_agent.html" class="nav-link">AI Agent</a>
+        <a href="finance_search.html" class="nav-link">Finance Search</a>
+        <a href="portfolio.html" class="nav-link">Portfolio Optimization</a>
+      </div>
+    </header>
+
+    <main class="page-wrap">
+      <!-- 상단 검색 -->
+      <form class="top-search" id="detail-search-form">
+        <input
+          id="detail-search-input"
+          type="text"
+          placeholder="무엇이든 검색하세요."
+          autocomplete="off"
+        />
+        <button type="submit">검색</button>
+      </form>
+
+      <!-- 기업 헤더 -->
+      <section class="company-header">
+        <div class="company-heading">
+          <h1 id="co-name">삼성전자</h1>
+          <span id="co-code" class="co-code">005930</span>
+        </div>
+        <p class="as-of" id="as-of">2025.11.05 15:30 기준</p>
+      </section>
+
+      <!-- 메인 요약 영역 -->
+      <section class="summary-row">
+        <!-- 차트 -->
+        <div class="price-chart">
+          <img src="assets/company_graph_large.png" alt="price graph" />
+        </div>
+
+        <!-- 가격/수치 -->
+        <div class="price-info">
+          <div class="price-line">
+            <span id="current-price" class="current-price">100,300</span>
+            <span class="diff-label">전일대비</span>
+            <span id="price-change" class="price-change down">
+              ▼ -4,300 (-4.10%)
+            </span>
+          </div>
+
+          <div class="stat-grid">
+            <div class="stat-pill">
+              <span class="stat-label">전일</span>
+              <span id="prev-close" class="stat-value">104,900</span>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-label">저가</span>
+              <span id="low-price" class="stat-value">96,700</span>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-label">시가</span>
+              <span id="open-price" class="stat-value green">103,500</span>
+            </div>
+
+            <div class="stat-pill medium">
+              <span class="stat-label">거래량</span>
+              <span id="volume" class="stat-value">36,942,796</span>
+            </div>
+
+            <div class="stat-pill">
+              <span class="stat-label">고가</span>
+              <span id="high-price" class="stat-value green">103,800</span>
+            </div>
+
+            <div class="stat-pill wide">
+              <span class="stat-label">거래대금</span>
+              <span class="stat-unit">(백만)</span>
+              <span id="value" class="stat-value">3,696,550</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 우측 테이블 -->
+        <div class="investor-panel">
+          <div class="investor-panel-top">
+            <h2 id="investor-title">투자자별 매매동향</h2>
+            <div class="dropdown" id="investor-dropdown">
+              <button type="button" class="dropdown-btn">
+                거래원 정보
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M7.29289 9.29289C7.68342 8.90237 8.31658 8.90237 8.70711 9.29289L12 12.5858L15.2929 9.29289C15.6834 8.90237 16.3166 8.90237 16.7071 9.29289C17.0976 9.68342 17.0976 10.3166 16.7071 10.7071L12.7071 14.7071C12.5196 14.8946 12.2652 15 12 15C11.7348 15 11.4804 14.8946 11.2929 14.7071L7.29289 10.7071C6.90237 10.3166 6.90237 9.68342 7.29289 9.29289Z"
+                    fill="#00D23F"
+                  />
+                </svg>
+              </button>
+              <ul class="dropdown-list">
+                <li data-type="broker">거래원 정보</li>
+                <li data-type="foreigner">외국인 거래현황</li>
+              </ul>
+            </div>
+          </div>
+          <table class="investor-table" id="investor-table">
+            <!-- js에서 채움 -->
+          </table>
+        </div>
+      </section>
+
+      <!-- 정보 선택 & 그래프 자리 -->
+      <section class="info-block">
+        <div class="info-topline">
+          <p class="info-label">필요한 정보를<br />선택하세요.</p>
+          <div class="dropdown info-dropdown" id="info-dropdown">
+            <button type="button" class="dropdown-btn-dark">
+              재무상태표
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M7.29289 9.29289C7.68342 8.90237 8.31658 8.90237 8.70711 9.29289L12 12.5858L15.2929 9.29289C15.6834 8.90237 16.3166 8.90237 16.7071 9.29289C17.0976 9.68342 17.0976 10.3166 16.7071 10.7071L12.7071 14.7071C12.5196 14.8946 12.2652 15 12 15C11.7348 15 11.4804 14.8946 11.2929 14.7071L7.29289 10.7071C6.90237 10.3166 6.90237 9.68342 7.29289 9.29289Z"
+                  fill="#00D23F"
+                />
+              </svg>
+            </button>
+            <ul class="dropdown-list">
+              <li data-type="bs">재무상태표</li>
+              <li data-type="is">손익계산서</li>
+              <li data-type="cf">현금흐름표</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="panel-row" id="panel-row">
+          <div class="info-panel">
+            <div class="panel-body dummy"></div>
+            <p class="panel-title" id="panel-title-1">자산총계</p>
+          </div>
+          <div class="info-panel">
+            <div class="panel-body dummy"></div>
+            <p class="panel-title" id="panel-title-2">부채총계</p>
+          </div>
+          <div class="info-panel">
+            <div class="panel-body dummy"></div>
+            <p class="panel-title" id="panel-title-3">자본총계</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 재무 테이블 -->
+      <section class="finance-table-section">
+        <h2 id="finance-title">삼성전자의 재무상태표</h2>
+        <p class="finance-desc">
+          재무상태표는 특정 시점에서 기업의 ‘자산·부채·자본’ 구조를 보여주는 표입니다.
+          기업이 보유한 자산과 이를 조달한 부채 및 자본의 관계를 통해 재무 건전성과
+          안정성을 판단할 수 있습니다.
+        </p>
+
+        <p class="unit">단위: 백만원</p>
+
+        <div class="year-row">
+
+          <button class="metric-btn active">재무정보</button>
+          <button class="year-chip active" data-year="2022">2022년</button>
+          <button class="year-chip" data-year="2023">2023년</button>
+          <button class="year-chip" data-year="2024">2024년</button>
+          <button class="year-chip" data-year="2025">2025년</button>
+        </div>
+
+        <div class="finance-grid" id="finance-grid">
+          <!-- 왼쪽 항목들 -->
+          <div class="metric-col">
+            <span class="metric-pill">매출액</span>
+            <span class="metric-pill">영업이익</span>
+            <span class="metric-pill">당기순이익</span>
+            <span class="metric-pill">영업이익률</span>
+            <span class="metric-pill">순이익률</span>
+            <span class="metric-pill">ROE</span>
+            <span class="metric-pill">부채비율</span>
+            <span class="metric-pill">당좌비율</span>
+            <span class="metric-pill">유보율</span>
+            <span class="metric-pill">EPS</span>
+            <span class="metric-pill">PBR</span>
+          </div>
+
+          <!-- 연도별 값 -->
+          <div class="year-col" data-year="2022">
+            <span class="val-pill">3,022,314</span>
+            <span class="val-pill">433,766</span>
+            <span class="val-pill">433,766</span>
+            <span class="val-pill">433,766</span>
+            <span class="val-pill">433,766</span>
+            <span class="val-pill">433,766</span>
+            <span class="val-pill">433,766</span>
+            <span class="val-pill">433,766</span>
+            <span class="val-pill">433,766</span>
+            <span class="val-pill">433,766</span>
+            <span class="val-pill">433,766</span>
+          </div>
+          <div class="year-col" data-year="2023">
+            <span class="val-pill">3,200,000</span>
+            <span class="val-pill">500,000</span>
+            <span class="val-pill">480,000</span>
+            <span class="val-pill">480,000</span>
+            <span class="val-pill">480,000</span>
+            <span class="val-pill">480,000</span>
+            <span class="val-pill">480,000</span>
+            <span class="val-pill">480,000</span>
+            <span class="val-pill">480,000</span>
+            <span class="val-pill">480,000</span>
+            <span class="val-pill">480,000</span>
+          </div>
+          <div class="year-col" data-year="2024">
+            <span class="val-pill">3,320,000</span>
+            <span class="val-pill">510,000</span>
+            <span class="val-pill">505,000</span>
+            <span class="val-pill">505,000</span>
+            <span class="val-pill">505,000</span>
+            <span class="val-pill">505,000</span>
+            <span class="val-pill">505,000</span>
+            <span class="val-pill">505,000</span>
+            <span class="val-pill">505,000</span>
+            <span class="val-pill">505,000</span>
+            <span class="val-pill">505,000</span>
+          </div>
+          <div class="year-col" data-year="2025">
+            <span class="val-pill">3,450,000</span>
+            <span class="val-pill">520,000</span>
+            <span class="val-pill">515,000</span>
+            <span class="val-pill">515,000</span>
+            <span class="val-pill">515,000</span>
+            <span class="val-pill">515,000</span>
+            <span class="val-pill">515,000</span>
+            <span class="val-pill">515,000</span>
+            <span class="val-pill">515,000</span>
+            <span class="val-pill">515,000</span>
+            <span class="val-pill">515,000</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="js/company_detail.js"></script>
+  </body>
+  <script src="js/common.js"></script>
+</html>

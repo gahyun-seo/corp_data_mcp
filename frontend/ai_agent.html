@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>DartAI – AI Agent</title>
+    <meta name="viewport" content="width=1280" />
+
+    <!-- Pretendard -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/agent.css" />
+  </head>
+  <body>
+    <div class="page">
+
+      <!-- 공통 네비 -->
+    <header class="top-nav">
+      <div class="nav-inner">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="ai_agent.html" class="nav-link">AI Agent</a>
+        <a href="finance_search.html" class="nav-link active">Finance Search</a>
+        <a href="portfolio.html" class="nav-link">Portfolio Optimization</a>
+      </div>
+    </header>
+
+      <!-- 메인 hero -->
+      <main class="agent-hero">
+        <div class="agent-inner">
+          <h1 class="agent-title">
+            Good Morning, <span class="accent">가현.</span>
+          </h1>
+          <p class="agent-sub">
+            MCP 기반으로 DART에서 가져온 재무데이터를 정리해놨어요.<br />
+            지금 바로 기업 하나 보거나, 업종 비교부터 해볼까요?
+          </p>
+
+          <!-- 검색 폼: 나중에 백엔드 연결 -->
+          <form id="agent-search-form" class="agent-search" action="#" method="GET">
+            <input
+              id="agent-search-input"
+              name="q"
+              type="text"
+              placeholder="무엇이든 검색하세요."
+              autocomplete="off"
+            />
+            <button type="submit" class="search-btn">검색</button>
+          </form>
+
+          <!-- 예제 질문 -->
+          <div class="agent-suggestions">
+            <button class="suggest-btn" data-query="삼성전자 최근 분기 재무 요약">삼성전자 최근 분기 재무 요약</button>
+            <button class="suggest-btn" data-query="KOSPI200 중 ROE 높은 순으로 5개">KOSPI200 중 ROE 높은 순으로 5개</button>
+            <button class="suggest-btn" data-query="LG화학이 업종 평균보다 어디가 좋은지 알려줘">LG화학이 업종 평균보다 어디가 좋은지 알려줘</button>
+          </div>
+        </div>
+      </main>
+
+    </div>
+    <script src="js/main.js"></script>
+  </body>
+  <script src="js/common.js"></script>
+</html>

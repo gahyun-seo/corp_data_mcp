@@ -5,3 +5,7 @@ python-dotenv
 openpyxl
 xlrd
 beautifulsoup4
+pdfminer.six
+scikit-learn
+sentence-transformers
+pdfminer_high_level
