@@ -9,3 +9,11 @@ pdfminer.six
 scikit-learn
 sentence-transformers
 pdfminer_high_level
+scipy
+pandas-datareader
+pykrx
+yfinance
+fastapi 
+uvicorn 
+requests
+setuptools
