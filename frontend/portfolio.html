@@ -39,18 +39,16 @@
           <section class="portfolio-chart">
             <button class="chart-arrow chart-prev" aria-label="previous chart">‹</button>
             <div class="chart-body">
-              <div class="chart-tab">Efficient Frontier</div>
+              <div class="chart-tab">Portfolio Weights</div>
               <div class="chart-slider" id="chart-slider">
-                <div class="chart-slide active">효율적 프런티어 그래프 자리</div>
-                <div class="chart-slide">리스크 vs 리턴 시뮬레이션</div>
-                <div class="chart-slide">섹터 비중 시각화</div>
+                <!-- 1) 종목 비중 바 차트 -->
+                <div class="chart-slide active"><canvas id="weightsChart"></canvas></div>
+                <!-- 2) 샤프·변동성·수익률 -->
+                <div class="chart-slide"><canvas id="statsChart"></canvas></div>
               </div>
-              <!-- status bar -->
               <div class="chart-status">
                 <button class="dot active" data-index="0"></button>
                 <button class="dot" data-index="1"></button>
-                <button class="dot" data-index="2"></button>
-                <span class="white-dot"></span>
               </div>
             </div>
             <button class="chart-arrow chart-next" aria-label="next chart">›</button>
@@ -58,6 +56,10 @@
 
           <!-- 컨트롤 영역 -->
           <section class="portfolio-controls narrow-section">
+            <div class="control-block">
+              <p class="control-label">포트폴리오를<br/>최적화하세요:</p>
+              <button id="optimize-btn" class="select-pill">최적화 실행</button>
+            </div>
             <!-- 드롭다운 1 -->
             <div class="control-block">
               <p class="control-label">포트폴리오의<br />목표를 선택하세요:</p>
@@ -84,7 +86,7 @@
               </ul>
             </div>
 
-            <!-- 드롭다운 2 -->
+            <!-- 드롭다운 2
             <div class="control-block">
               <p class="control-label">포트폴리오의<br />목표를 선택하세요:</p>
               <button class="select-pill" data-dropdown-target="goal-2">
@@ -107,21 +109,23 @@
                 <li data-value="배당 안정형">배당 안정형</li>
                 <li data-value="리스크 최소화">리스크 최소화</li>
               </ul>
-            </div>
+            </div> -->
 
             <!-- 종목 추가 -->
             <div class="control-block wide">
             <p class="control-label">포트폴리오에<br />종목을 추가해보세요:</p>
             <form id="add-stock-form" class="stock-form">
-                <div class="search-pill">
+              <div class="search-pill">
                 <input
-                    type="text"
-                    id="stock-input"
-                    placeholder="무엇이든 검색하세요."
-                    autocomplete="off"
+                  type="text"
+                  id="stock-input"
+                  placeholder="기업명 또는 종목코드(6자리)를 입력하세요."
+                  autocomplete="off"
                 />
                 <button type="submit" class="search-btn-inside">검색</button>
-                </div>
+              </div>
+              <!-- 자동완성 제안 -->
+              <ul id="search-suggest" class="search-suggest"></ul>
             </form>
             </div>
           </section>
@@ -129,21 +133,19 @@
           <!-- 테이블 -->
           <section class="portfolio-table narrow-section" id="portfolio-table">
             <div class="metrics-col">
-              <button class="metric-btn metric-btn--active">재무정보</button>
-              <button class="metric-btn">매출액</button>
-              <button class="metric-btn">영업이익</button>
-              <button class="metric-btn">당기순이익</button>
-              <button class="metric-btn">영업이익률</button>
-              <button class="metric-btn">순이익률</button>
-              <button class="metric-btn">ROE</button>
-              <button class="metric-btn">부채비율</button>
-              <button class="metric-btn">당좌비율</button>
-              <button class="metric-btn">유보율</button>
-              <button class="metric-btn">EPS</button>
-              <button class="metric-btn">PBR</button>
-              <button class="metric-btn">주당배당금</button>
-              <button class="metric-btn">시가배당률</button>
-              <button class="metric-btn">배당성향</button>
+              <button class="metric-btn metric-btn--active" data-key="overview">주가정보</button>
+              <button class="metric-btn" data-key="close_price">종가</button>
+              <button class="metric-btn" data-key="change_price">전일대비</button>
+              <button class="metric-btn" data-key="change_rate">등락률(%)</button>
+              <button class="metric-btn" data-key="market_cap">시가총액 (백만원)</button>
+              <button class="metric-btn" data-key="listed_shares">상장주식수</button>
+              <button class="metric-btn" data-key="volume">거래량</button>
+              <button class="metric-btn" data-key="trading_value">거래대금</button>
+              <button class="metric-btn" data-key="per">PER</button>
+              <button class="metric-btn" data-key="pbr">PBR</button>
+              <button class="metric-btn" data-key="eps">EPS</button>
+              <button class="metric-btn" data-key="bps">BPS</button>
+              <button class="metric-btn" data-key="div_yield">배당수익률(%)</button>
             </div>
             <div class="companies" id="companies-wrap"></div>
           </section>
@@ -164,7 +166,7 @@
         </div>
       </main>
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/portfolio.js"></script>
   </body>
   <script src="js/common.js"></script>

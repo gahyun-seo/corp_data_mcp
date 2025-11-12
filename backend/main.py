@@ -6,11 +6,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Dict, Optional
 import logging
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 
-from backend.routers.stocks import stock_service
-from backend.routers.portfolio import portfolio_optimizer
-from .routers import ai_agent
-from .routers import finance
+from .routers import ai_agent, finance
+from .routers.stocks import stock_service
+from .routers.portfolio import portfolio_optimizer
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -81,6 +82,17 @@ def read_root():
             "portfolio_optimize": "/api/portfolio/optimize"
         }
     }
+@app.get("/api/stocks/lookup")
+def lookup_stocks(q: str, limit: int = 10):
+    """
+    종목명/코드 검색 (부분일치). 예: /api/stocks/lookup?q=삼성
+    """
+    try:
+        items = stock_service.search_stocks(q, limit=limit)
+        return JSONResponse(content=jsonable_encoder({"results": items}))
+    except Exception as e:
+        logger.error(f"lookup 실패: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/api/stocks/{stock_code}")
@@ -213,6 +225,8 @@ def health_check():
             "portfolio": "ok"
         }
     }
+    
+
 
 
 # ============================================================================
