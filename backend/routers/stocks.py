@@ -7,6 +7,9 @@ from datetime import datetime, timedelta
 from dataclasses import dataclass
 import pandas as pd
 import logging
+import numpy as np
+
+import math
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -404,6 +407,29 @@ class StockDataFetcher:
         
         return result
 
+def _sanitize_for_json(obj):
+    """dict/list 안의 NaN/Inf/np types를 JSON 직렬화 가능 값으로 변환"""
+    if isinstance(obj, dict):
+        return {k: _sanitize_for_json(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_sanitize_for_json(v) for v in obj]
+    # numpy 수치형 -> 파이썬 기본형
+    if isinstance(obj, (np.integer, np.int32, np.int64)):
+        return int(obj)
+    if isinstance(obj, (np.floating, np.float32, np.float64)):
+        v = float(obj)
+        return v if math.isfinite(v) else None
+    # 파이썬 float NaN/Inf 처리
+    if isinstance(obj, float):
+        return obj if math.isfinite(obj) else None
+    # pandas NaT/NaN 같은 것
+    try:
+        import pandas as pd
+        if pd.isna(obj):
+            return None
+    except Exception:
+        pass
+    return obj
 
 class StockService:
     """주식 데이터 서비스 (대시보드용)"""
@@ -430,7 +456,43 @@ class StockService:
         # 과거 30일 데이터
         history_df = self.fetcher.get_stock_data(stock_code, days=30)
         
-        return {
+        # ---- 여기부터 추가: NaN/Inf 정리 + 필요한 컬럼만 선택 + 날짜 문자열화 ----
+        history_records = []
+        if history_df is not None and not history_df.empty:
+            df = history_df.copy()
+
+            # 인덱스가 날짜이면 문자열 컬럼 추가(YYYYMMDD)
+            if isinstance(df.index, pd.DatetimeIndex):
+                df.insert(0, "date", df.index.strftime("%Y%m%d"))
+            else:
+                try:
+                    df.insert(0, "date", pd.to_datetime(df.index).strftime("%Y%m%d"))
+                except Exception:
+                    df.insert(0, "date", df.index.astype(str))
+
+            wanted_cols = [
+                "date", "stock_code", "stock_name",
+                "open", "high", "low", "close",
+                "volume", "trading_value",
+                "change", "change_rate",
+                "market_cap", "listed_shares",
+                "per", "pbr", "eps", "bps", "div_yield"
+            ]
+            for c in wanted_cols:
+                if c not in df.columns:
+                    df[c] = None
+
+            # Inf → NaN → None
+            df = df.replace([np.inf, -np.inf], np.nan).where(pd.notna(df), None)
+
+            # numpy 타입 -> 파이썬 기본형으로 변환되도록 object 캐스팅(선택)
+            df = df.astype(object)
+
+            history_records = df[wanted_cols].to_dict("records")    
+        # ---- 추가 끝 ----
+
+        
+        response = {
             "stock_code": stock_code,
             "stock_name": latest.stock_name,
             "current_data": {
@@ -446,8 +508,9 @@ class StockService:
                 "bps": latest.bps,
                 "div_yield": latest.div_yield
             },
-            "history_data": history_df.to_dict('records') if not history_df.empty else []
+            "history_data": history_records
         }
+        return _sanitize_for_json(response)
     
     def get_portfolio_data(self, stock_codes: List[str], days: int = 252) -> Dict[str, pd.DataFrame]:
         """
@@ -461,6 +524,50 @@ class StockService:
             {종목코드: DataFrame} 딕셔너리
         """
         return self.fetcher.get_multiple_stocks_data(stock_codes, days=days)
+    def search_stocks(self, query: str, limit: int = 10):
+        """
+        종목명/코드 부분일치 검색 (KOSPI/KOSDAQ)
+        반환: [{stock_code, stock_name, market}]
+        """
+        try:
+            from pykrx import stock
+            query = (query or "").strip()
+            if not query:
+                return []
+
+            results = []
+            # 두 시장 모두 탐색
+            for market in ["KOSPI", "KOSDAQ"]:
+                codes = stock.get_market_ticker_list(market=market)
+                for code in codes:
+                    try:
+                        name = self.fetcher._get_stock_name(code)
+                        if (query in name) or (query in code):
+                            results.append({
+                                "stock_code": code,
+                                "stock_name": name,
+                                "market": market
+                            })
+                    except Exception:
+                        continue
+
+            # 중복 제거 및 정렬(이름에 먼저 매치된 것 우선)
+            # 간단 가중치: 이름매치 0, 코드매치 1 → 오름차순
+            def score(item):
+                name = item["stock_name"]
+                code = item["stock_code"]
+                if query in name:
+                    return 0
+                if query in code:
+                    return 1
+                return 2
+
+            results.sort(key=score)
+            return results[:limit]
+        except Exception as e:
+            logger.warning(f"search_stocks error: {e}")
+            return []
+
 
 
 # 전역 인스턴스
