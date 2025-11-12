@@ -1,4 +1,8 @@
-// 더미 데이터 (프론트 전용)
+// company_detail.js (요약연결재무정보 선택 가능 버전)
+
+const API_BASE = "http://127.0.0.1:8000";
+
+// 상단 더미(주가 영역) – 지금 하는 재무랑 별개
 const COMPANY_DATA = {
   "삼성전자": {
     code: "005930",
@@ -22,188 +26,44 @@ const COMPANY_DATA = {
     volume: "12,842,100",
     value: "1,240,500",
   },
-  "현대차": {
-    code: "005380",
-    price: "212,500",
-    diff: { sign: "-", text: "-1,500 (-0.70%)" },
-    prev: "214,000",
-    open: "213,500",
-    high: "215,500",
-    low: "211,000",
-    volume: "4,320,000",
-    value: "590,300",
-  },
-  "LG화학": {
-    code: "051910",
-    price: "501,000",
-    diff: { sign: "+", text: "+6,000 (+1.21%)" },
-    prev: "495,000",
-    open: "498,000",
-    high: "503,000",
-    low: "494,500",
-    volume: "780,200",
-    value: "393,000",
-  },
 };
 
-// 투자자/외국인 더미
-const INVESTOR_DATA = {
-  broker: [
-    ["미래에셋증권", "6,147,541", "4,925,367"],
-    ["삼성증권", "1,547,200", "1,125,000"],
-    ["키움증권", "980,300", "720,000"],
-    ["한국투자", "870,000", "650,000"],
-    ["NH투자증권", "640,000", "520,000"],
-  ],
-  foreigner: [
-    ["외국인 순매수", "3,420,000", "—"],
-    ["기관 순매수", "1,120,000", "—"],
-    ["연기금", "420,000", "—"],
-    ["프로그램", "210,000", "—"],
-  ],
-};
-
-// 드롭다운에 따른 위쪽 패널 제목
+// 위쪽 패널 제목 프리셋
 const PANEL_PRESETS = {
   bs: ["자산총계", "부채총계", "자본총계"],
   is: ["매출액", "영업이익", "당기순이익"],
   cf: ["영업활동현금흐름", "투자활동현금흐름", "재무활동현금흐름"],
+  // ✅ 요약연결재무정보일 때는 대표 3개만
+  all: ["자산총계", "부채총계", "자본총계"],
 };
 
-// 드롭다운에 따른 표(왼쪽 열) 라벨
-const METRIC_LABELS = {
-  bs: [
-    "자산총계",
-    "유동자산",
-    "비유동자산",
-    "부채총계",
-    "유동부채",
-    "비유동부채",
-    "자본총계",
-    "자본금",
-    "이익잉여금",
-    "기타포괄손익",
-    "자본조정",
-    "소수주주지분",
-  ],
-  is: [
-    "매출액",
-    "매출원가",
-    "매출총이익",
-    "판매관리비",
-    "영업이익",
-    "영업외수익",
-    "법인세비용차감전이익",
-    "법인세",
-    "당기순이익",
-    "총포괄이익",
-    "주당순이익(EPS)",
-    "기타",
-  ],
-  cf: [
-    "영업활동현금흐름",
-    "당기순이익",
-    "감가상각비",
-    "투자활동현금흐름",
-    "유형자산취득",
-    "재무활동현금흐름",
-    "배당금지급",
-    "차입금변동",
-    "현금및현금성자산증가",
-    "기초현금",
-    "기말현금",
-    "기타",
-  ],
+// 백엔드 -> 프런트 테이블 이름 매핑
+const TABLE_NAME_BY_VIEW = {
+  bs: "연결재무상태표",
+  is: "연결포괄손익계산서",
+  cf: "연결현금흐름표",
+  all: "요약연결재무정보", // ✅ 이거 이미 네가 써놨던 거 살림
 };
 
-// util: 쿼리 파라미터
+let CURRENT_FINANCE = null;
+let CURRENT_VIEW_TYPE = "bs";
+
+// 숫자 3자리 콤마
+function formatNumber(val) {
+  if (val === null || val === undefined || val === "") return "-";
+  const n = Number(val);
+  if (Number.isNaN(n)) return val;
+  return n.toLocaleString("ko-KR");
+}
+
+// 쿼리스트링 가져오기
 function getQuery(name) {
   const params = new URLSearchParams(window.location.search);
   return params.get(name);
 }
 
-// 페이지 로드
-document.addEventListener("DOMContentLoaded", () => {
-  const q = getQuery("q");
-  const co = q && COMPANY_DATA[q] ? COMPANY_DATA[q] : COMPANY_DATA["삼성전자"];
-  const coName = q || "삼성전자";
-
-  // 기본 회사 정보 그리기
-  renderCompany(co, coName);
-
-  // 검색 => 다른 회사로 이동
-  const form = document.getElementById("detail-search-form");
-  const input = document.getElementById("detail-search-input");
-  if (form && input) {
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const v = input.value.trim();
-      if (!v) return;
-      window.location.href = `company_detail.html?q=${encodeURIComponent(v)}`;
-    });
-  }
-
-  // 투자자 드롭다운
-  const investorDropdown = document.getElementById("investor-dropdown");
-  if (investorDropdown) {
-    const btn = investorDropdown.querySelector(".dropdown-btn");
-    const list = investorDropdown.querySelector(".dropdown-list");
-
-    btn.addEventListener("click", () => {
-      investorDropdown.classList.toggle("open");
-    });
-
-    list.addEventListener("click", (e) => {
-      const li = e.target.closest("li");
-      if (!li) return;
-      const type = li.dataset.type;
-      fillInvestorTable(type);
-      // 버튼 텍스트 바꾸기
-      btn.childNodes[0].nodeValue = type === "broker" ? "거래원 정보" : "외국인 거래현황";
-      investorDropdown.classList.remove("open");
-    });
-
-    // 초기값
-    fillInvestorTable("broker");
-  }
-
-  // info 드롭다운 (재무상태표 / 손익계산서 / 현금흐름표)
-  const infoDropdown = document.getElementById("info-dropdown");
-  if (infoDropdown) {
-    const btn = infoDropdown.querySelector(".dropdown-btn-dark");
-    const list = infoDropdown.querySelector(".dropdown-list");
-
-    btn.addEventListener("click", () => {
-      infoDropdown.classList.toggle("open");
-    });
-
-    list.addEventListener("click", (e) => {
-      const li = e.target.closest("li");
-      if (!li) return;
-      const type = li.dataset.type;
-      applyInfoType(type, coName); // 여기서 패널 + 제목 + row 라벨 다 바꿈
-      btn.childNodes[0].nodeValue =
-        type === "bs" ? "재무상태표" : type === "is" ? "손익계산서" : "현금흐름표";
-      infoDropdown.classList.remove("open");
-    });
-
-    // 페이지 처음 열릴 때도 한 번 적용해두기 (기본 bs)
-    applyInfoType("bs", coName);
-  }
-
-  // 연도 버튼
-  document.querySelectorAll(".year-chip").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".year-chip").forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-      const year = btn.dataset.year;
-      showYear(year);
-    });
-  });
-});
-
-// 회사 데이터 뿌리기
-function renderCompany(co, nameLabel) {
+// 상단 회사 정보
+function renderCompanyHeader(co, nameLabel) {
   const nameEl = document.getElementById("co-name");
   const codeEl = document.getElementById("co-code");
   const priceEl = document.getElementById("current-price");
@@ -230,10 +90,12 @@ function renderCompany(co, nameLabel) {
   if (lowEl) lowEl.textContent = co.low;
   if (volEl) volEl.textContent = co.volume;
   if (valEl) valEl.textContent = co.value;
+
+  // 기본은 재무상태표
   if (financeTitle) financeTitle.textContent = `${nameLabel}의 재무상태표`;
 }
 
-// 투자자 테이블 채우기
+// 투자자 표 (더미)
 function fillInvestorTable(type) {
   const table = document.getElementById("investor-table");
   const title = document.getElementById("investor-title");
@@ -242,14 +104,18 @@ function fillInvestorTable(type) {
 
   if (type === "broker") {
     title.textContent = "투자자별 매매동향";
-
     const thead = document.createElement("thead");
     thead.innerHTML =
       "<tr><th>매도 상위</th><th>거래량</th><th>매수 상위</th><th>거래량</th></tr>";
     table.appendChild(thead);
-
     const tbody = document.createElement("tbody");
-    INVESTOR_DATA.broker.forEach((row) => {
+    [
+      ["미래에셋증권", "6,147,541", "4,925,367"],
+      ["삼성증권", "1,547,200", "1,125,000"],
+      ["키움증권", "980,300", "720,000"],
+      ["한국투자", "870,000", "650,000"],
+      ["NH투자증권", "640,000", "520,000"],
+    ].forEach((row) => {
       const tr = document.createElement("tr");
       tr.innerHTML = `<td>${row[0]}</td><td>${row[1]}</td><td>${row[0]}</td><td>${row[2]}</td>`;
       tbody.appendChild(tr);
@@ -257,13 +123,16 @@ function fillInvestorTable(type) {
     table.appendChild(tbody);
   } else {
     title.textContent = "외국인 거래현황";
-
     const thead = document.createElement("thead");
     thead.innerHTML = "<tr><th>구분</th><th>거래량</th><th colspan='2'>비고</th></tr>";
     table.appendChild(thead);
-
     const tbody = document.createElement("tbody");
-    INVESTOR_DATA.foreigner.forEach((row) => {
+    [
+      ["외국인 순매수", "3,420,000", "—"],
+      ["기관 순매수", "1,120,000", "—"],
+      ["연기금", "420,000", "—"],
+      ["프로그램", "210,000", "—"],
+    ].forEach((row) => {
       const tr = document.createElement("tr");
       tr.innerHTML = `<td>${row[0]}</td><td>${row[1]}</td><td colspan="2">${
         row[2] ?? ""
@@ -274,8 +143,58 @@ function fillInvestorTable(type) {
   }
 }
 
-// 정보 드롭다운 바뀔 때 아래 패널, 제목, 표 라벨까지 다 바꾸기
+// 실제로 그리드 그리기
+function renderFinanceTable(viewType) {
+  if (!CURRENT_FINANCE) return;
+
+  const tableName = TABLE_NAME_BY_VIEW[viewType];
+  const rows = (CURRENT_FINANCE.tables && CURRENT_FINANCE.tables[tableName]) || [];
+
+  console.log(`[finance] table=${tableName}`, rows);
+
+  const grid = document.getElementById("finance-grid");
+  if (!grid) return;
+  grid.innerHTML = "";
+
+  // 왼쪽 항목
+  const metricCol = document.createElement("div");
+  metricCol.className = "metric-col";
+  rows.forEach((row) => {
+    const span = document.createElement("span");
+    span.className = "metric-pill";
+    span.textContent = row.name || "";
+    metricCol.appendChild(span);
+  });
+  grid.appendChild(metricCol);
+
+  // 연도 열 4개 고정 (앞의 설명처럼 2025=current, 2024=previous)
+  const years = ["2022", "2023", "2024", "2025"];
+  years.forEach((year) => {
+    const col = document.createElement("div");
+    col.className = "year-col";
+    col.dataset.year = year;
+
+    rows.forEach((row) => {
+      const v = document.createElement("span");
+      v.className = "val-pill";
+      if (year === "2025") {
+        v.textContent = formatNumber(row.current);
+      } else if (year === "2024") {
+        v.textContent = formatNumber(row.previous);
+      } else {
+        v.textContent = "-";
+      }
+      col.appendChild(v);
+    });
+
+    grid.appendChild(col);
+  });
+}
+
+// 드롭다운에서 타입 바꼈을 때
 function applyInfoType(type, coName) {
+  CURRENT_VIEW_TYPE = type;
+
   const titles = PANEL_PRESETS[type] || PANEL_PRESETS.bs;
   const p1 = document.getElementById("panel-title-1");
   const p2 = document.getElementById("panel-title-2");
@@ -291,29 +210,107 @@ function applyInfoType(type, coName) {
         ? `${coName}의 재무상태표`
         : type === "is"
         ? `${coName}의 손익계산서`
-        : `${coName}의 현금흐름표`;
+        : type === "cf"
+        ? `${coName}의 현금흐름표`
+        : `${coName}의 요약재무정보`; // ✅ all일 때
   }
 
-  // ✅ 왼쪽 표 라벨도 같이 바꾸기
-  updateMetricNames(type);
+  renderFinanceTable(type);
 }
 
-// 왼쪽 열 라벨 갈아끼우기
-function updateMetricNames(type) {
-  const labels = METRIC_LABELS[type] || METRIC_LABELS.bs;
-  const pills = document.querySelectorAll(".metric-col .metric-pill");
-  pills.forEach((el, idx) => {
-    if (labels[idx]) {
-      el.textContent = labels[idx];
-    } else {
-      el.textContent = "";
-    }
-  });
-}
-
-// 연도 보여줄 때는 단순히 active만 바꿈 (여러 값 세트면 여기서 바꿔)
+// 연도 칩 – 지금은 모두 1로 둔 상태 (애니메이션 끈 버전)
 function showYear(year) {
   document.querySelectorAll(".year-col").forEach((col) => {
-    col.style.opacity = col.dataset.year === year ? "1" : "0.35";
+    col.style.opacity = col.dataset.year === year ? "1" : "1";
   });
 }
+
+// 로드
+document.addEventListener("DOMContentLoaded", async () => {
+  const q = getQuery("q");
+  const co = q && COMPANY_DATA[q] ? COMPANY_DATA[q] : COMPANY_DATA["삼성전자"];
+  const coName = q || "삼성전자";
+
+  renderCompanyHeader(co, coName);
+
+  // 검색 폼
+  const form = document.getElementById("detail-search-form");
+  const input = document.getElementById("detail-search-input");
+  if (form && input) {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const v = input.value.trim();
+      if (!v) return;
+      window.location.href = `company_detail.html?q=${encodeURIComponent(v)}`;
+    });
+  }
+
+  // 투자자 드롭다운
+  const investorDropdown = document.getElementById("investor-dropdown");
+  if (investorDropdown) {
+    const btn = investorDropdown.querySelector(".dropdown-btn");
+    const list = investorDropdown.querySelector(".dropdown-list");
+
+    btn.addEventListener("click", () => {
+      investorDropdown.classList.toggle("open");
+    });
+
+    list.addEventListener("click", (e) => {
+      const li = e.target.closest("li");
+      if (!li) return;
+      const type = li.dataset.type;
+      fillInvestorTable(type);
+      btn.childNodes[0].nodeValue =
+        type === "broker" ? "거래원 정보" : "외국인 거래현황";
+      investorDropdown.classList.remove("open");
+    });
+
+    fillInvestorTable("broker");
+  }
+
+  // 백엔드에서 재무 가져오기
+  try {
+    const resp = await fetch(`${API_BASE}/finance/${co.code}`);
+    if (resp.ok) {
+      CURRENT_FINANCE = await resp.json();
+      console.log("[finance] loaded", CURRENT_FINANCE);
+    } else {
+      console.warn("finance api not ok", resp.status);
+      CURRENT_FINANCE = null;
+    }
+  } catch (err) {
+    console.warn("finance api error", err);
+    CURRENT_FINANCE = null;
+  }
+
+  // info 드롭다운
+  const infoDropdown = document.getElementById("info-dropdown");
+  if (infoDropdown) {
+    const btn = infoDropdown.querySelector(".dropdown-btn-dark");
+    const list = infoDropdown.querySelector(".dropdown-list");
+
+    btn.addEventListener("click", () => {
+      infoDropdown.classList.toggle("open");
+    });
+
+    list.addEventListener("click", (e) => {
+      const li = e.target.closest("li");
+      if (!li) return;
+      const type = li.dataset.type;
+      applyInfoType(type, coName);
+      // 버튼 라벨도 바꿔주기
+      btn.childNodes[0].nodeValue =
+        type === "bs"
+          ? "재무상태표"
+          : type === "is"
+          ? "손익계산서"
+          : type === "cf"
+          ? "현금흐름표"
+          : "요약재무정보";
+      infoDropdown.classList.remove("open");
+    });
+  }
+
+  // 처음엔 재무상태표
+  applyInfoType("bs", coName);
+});

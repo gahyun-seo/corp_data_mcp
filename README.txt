@@ -1,3 +1,6 @@
+# Fast API 실행 명령
+uvicorn mcp_db.backend.main:app --reload
+
 # 🧩 AI Agent for Corporate Reports (`mcp_db/ai_agent/`)
 
 이 모듈은 **기업 공시 DB(reports, attachments)** 에 저장된 보고서를 기반으로  
