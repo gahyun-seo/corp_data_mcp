@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>DartAI – AI Agent Chat</title>
+    <meta name="viewport" content="width=1280" />
+
+    <!-- Pretendard -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css"
+    />
+
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/agent-chat.css" />
+  </head>
+  <body>
+    <div class="page">
+      <!-- 공통 네비 -->
+      <header class="top-nav" id="top-nav">
+        <div class="nav-inner">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="ai_agent.html" class="nav-link">AI Agent</a>
+          <a href="finance_search.html" class="nav-link active">Finance Search</a>
+          <a href="portfolio.html" class="nav-link">Portfolio Optimization</a>
+        </div>
+      </header>
+
+      <!-- 채팅 화면 -->
+      <main class="chat-page">
+        <h1 class="chat-title" id="chat-topic">AI Agent 대화</h1>
+
+        <div class="chat-card">
+          <div class="chat-body" id="chat-body"></div>
+        </div>
+
+        <form id="chat-input-form" class="chat-input">
+          <input
+            type="text"
+            id="chat-input"
+            name="q"
+            placeholder="무엇이든 검색하세요."
+            autocomplete="off"
+          />
+          <button type="submit" class="chat-submit">검색</button>
+        </form>
+      </main>
+    </div>
+
+    <!-- 여기서부터 JS는 공용 것만 불러오고, 실제 채팅 로직은 main.js 3)에서 처리 -->
+    <script src="js/main.js"></script>
+    <script src="js/common.js"></script>
+  </body>
+</html>

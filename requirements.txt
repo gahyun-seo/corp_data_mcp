@@ -1,0 +1,11 @@
+opendartreader>=0.2.3
+pandas>=2.0.0
+numpy
+python-dotenv
+openpyxl
+xlrd
+beautifulsoup4
+pdfminer.six
+scikit-learn
+sentence-transformers
+pdfminer_high_level

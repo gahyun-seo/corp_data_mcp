@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>DartAI – Portfolio Optimization</title>
+    <meta name="viewport" content="width=1280" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/portfolio.css" />
+  </head>
+  <body>
+    <div class="page black-bg">
+      <!-- 공통 네비 -->
+    <header class="top-nav" id = "top-nav">
+      <div class="nav-inner">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="ai_agent.html" class="nav-link">AI Agent</a>
+        <a href="finance_search.html" class="nav-link">Finance Search</a>
+        <a href="portfolio.html" class="nav-link">Portfolio Optimization</a>
+      </div>
+    </header>
+
+      <main class="portfolio-wrap">
+        <div class="portfolio-inner">
+          <!-- 헤더 -->
+          <section class="portfolio-header">
+            <p class="eyebrow">KOSPI200 기업 데이터를 기반으로 효율적인 포트폴리오를 구성하세요.</p>
+            <div class="header-row">
+              <h1>Build Your Portfolio.</h1>
+              <p class="header-desc">
+                AI가 종목 간 상관관계를 분석하고,<br />
+                위험 대비 수익률이 가장 높은 조합을 자동으로 계산합니다.
+              </p>
+            </div>
+          </section>
+
+          <!-- 그래프 슬라이더 -->
+          <section class="portfolio-chart">
+            <button class="chart-arrow chart-prev" aria-label="previous chart">‹</button>
+            <div class="chart-body">
+              <div class="chart-tab">Efficient Frontier</div>
+              <div class="chart-slider" id="chart-slider">
+                <div class="chart-slide active">효율적 프런티어 그래프 자리</div>
+                <div class="chart-slide">리스크 vs 리턴 시뮬레이션</div>
+                <div class="chart-slide">섹터 비중 시각화</div>
+              </div>
+              <!-- status bar -->
+              <div class="chart-status">
+                <button class="dot active" data-index="0"></button>
+                <button class="dot" data-index="1"></button>
+                <button class="dot" data-index="2"></button>
+                <span class="white-dot"></span>
+              </div>
+            </div>
+            <button class="chart-arrow chart-next" aria-label="next chart">›</button>
+          </section>
+
+          <!-- 컨트롤 영역 -->
+          <section class="portfolio-controls narrow-section">
+            <!-- 드롭다운 1 -->
+            <div class="control-block">
+              <p class="control-label">포트폴리오의<br />목표를 선택하세요:</p>
+              <button class="select-pill" data-dropdown-target="goal-1">
+                안전한 고정 수익
+                <span class="select-icon">
+                  <!-- 네가 준 svg -->
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M7.29289 9.29289C7.68342 8.90237 8.31658 8.90237 8.70711 9.29289L12 12.5858L15.2929 9.29289C15.6834 8.90237 16.3166 8.90237 16.7071 9.29289C17.0976 9.68342 17.0976 10.3166 16.7071 10.7071L12.7071 14.7071C12.5196 14.8946 12.2652 15 12 15C11.7348 15 11.4804 14.8946 11.2929 14.7071L7.29289 10.7071C6.90237 10.3166 6.90237 9.68342 7.29289 9.29289Z"
+                      fill="#00D23F"
+                    />
+                  </svg>
+                </span>
+              </button>
+              <ul class="select-list" id="goal-1">
+                <li data-value="안전한 고정 수익">안전한 고정 수익</li>
+                <li data-value="중위험 중수익">중위험 중수익</li>
+                <li data-value="공격적 성장">공격적 성장</li>
+                <li data-value="배당 안정형">배당 안정형</li>
+                <li data-value="리스크 최소화">리스크 최소화</li>
+              </ul>
+            </div>
+
+            <!-- 드롭다운 2 -->
+            <div class="control-block">
+              <p class="control-label">포트폴리오의<br />목표를 선택하세요:</p>
+              <button class="select-pill" data-dropdown-target="goal-2">
+                안전한 고정 수익
+                <span class="select-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M7.29289 9.29289C7.68342 8.90237 8.31658 8.90237 8.70711 9.29289L12 12.5858L15.2929 9.29289C15.6834 8.90237 16.3166 8.90237 16.7071 9.29289C17.0976 9.68342 17.0976 10.3166 16.7071 10.7071L12.7071 14.7071C12.5196 14.8946 12.2652 15 12 15C11.7348 15 11.4804 14.8946 11.2929 14.7071L7.29289 10.7071C6.90237 10.3166 6.90237 9.68342 7.29289 9.29289Z"
+                      fill="#00D23F"
+                    />
+                  </svg>
+                </span>
+              </button>
+              <ul class="select-list" id="goal-2">
+                <li data-value="안전한 고정 수익">안전한 고정 수익</li>
+                <li data-value="중위험 중수익">중위험 중수익</li>
+                <li data-value="공격적 성장">공격적 성장</li>
+                <li data-value="배당 안정형">배당 안정형</li>
+                <li data-value="리스크 최소화">리스크 최소화</li>
+              </ul>
+            </div>
+
+            <!-- 종목 추가 -->
+            <div class="control-block wide">
+            <p class="control-label">포트폴리오에<br />종목을 추가해보세요:</p>
+            <form id="add-stock-form" class="stock-form">
+                <div class="search-pill">
+                <input
+                    type="text"
+                    id="stock-input"
+                    placeholder="무엇이든 검색하세요."
+                    autocomplete="off"
+                />
+                <button type="submit" class="search-btn-inside">검색</button>
+                </div>
+            </form>
+            </div>
+          </section>
+
+          <!-- 테이블 -->
+          <section class="portfolio-table narrow-section" id="portfolio-table">
+            <div class="metrics-col">
+              <button class="metric-btn metric-btn--active">재무정보</button>
+              <button class="metric-btn">매출액</button>
+              <button class="metric-btn">영업이익</button>
+              <button class="metric-btn">당기순이익</button>
+              <button class="metric-btn">영업이익률</button>
+              <button class="metric-btn">순이익률</button>
+              <button class="metric-btn">ROE</button>
+              <button class="metric-btn">부채비율</button>
+              <button class="metric-btn">당좌비율</button>
+              <button class="metric-btn">유보율</button>
+              <button class="metric-btn">EPS</button>
+              <button class="metric-btn">PBR</button>
+              <button class="metric-btn">주당배당금</button>
+              <button class="metric-btn">시가배당률</button>
+              <button class="metric-btn">배당성향</button>
+            </div>
+            <div class="companies" id="companies-wrap"></div>
+          </section>
+
+          <!-- Agent 코멘트 -->
+          <section class="agent-panel">
+            <div class="agent-badge"></div>
+            <div>
+              <p class="agent-title">Your Agent Says:</p>
+              <p class="agent-highlight">이 포트폴리오는 수익성과 안정성의 균형이 잘 잡혔습니다.</p>
+            </div>
+            <p class="agent-body">
+              현재 구성은 효율적 프런티어 상의 중간 구간에 위치하고 있습니다. 평균 기대수익률은 약 8.9%, 변동성은 6.1%,
+              샤프지수는 1.46으로 안정적인 효율성을 보여줍니다. 산업별로는 IT와 금융 섹터가 전체 수익의 60% 이상을 차지하며,
+              방어형 자산의 적절한 비중이 전반적인 변동성을 낮추는 데 기여하고 있습니다.
+            </p>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <script src="js/portfolio.js"></script>
+  </body>
+  <script src="js/common.js"></script>
+</html>
