@@ -305,14 +305,21 @@ import json
 import sqlite3
 import json
 
+# mcp_db/ai_agent/loaders.py 안에
+
+import sqlite3, json
+
 def load_structured_financial_texts(
     db_path: str,
     stocks: list[str],
     tables: list[str] | None = None,
 ) -> dict[str, str]:
     """
-    각 raw 테이블(summary_fin_raw, balance_sheet_raw, ...)을 LLM이 읽기 쉬운 텍스트로 변환한다.
-    네 DB 구조(= section_tag, row_json, 주석만 note_title 있음)에 맞춰서 작성한 버전.
+    각 raw 테이블을 LLM이 읽기 쉬운 텍스트로 변환한다.
+    중복되는 stock_code, corp_name, rcept_no 는 위에 한 번만 쓰고
+    그 아래에 실제 row_json 값들만 나열해서 길이를 줄인다.
+    또한 [표: 재무제표주석] 블록은 한 덩어리로 만들어두고,
+    service.py에서 질문에 '주석'이 있으면 이 블록만 뽑아서 보낼 수 있게 한다.
     """
     if tables is None:
         tables = [
@@ -348,8 +355,8 @@ def load_structured_financial_texts(
             pretty_name = TABLE_NAME_MAP.get(tbl, tbl)
 
             for stock in stocks:
-                # 주석 테이블은 note_number, note_title이 있어서 따로 SELECT
                 if tbl == "financial_notes_raw":
+                    # ───────── 주석 테이블은 note 번호 단위로 묶기 ─────────
                     cur.execute(
                         f"""
                         SELECT
@@ -370,8 +377,11 @@ def load_structured_financial_texts(
                     if not rows:
                         continue
 
-                    # 섹션 헤더
-                    stock2lines[stock].append(f"[표: {pretty_name}]")
+                    lines = stock2lines[stock]
+                    lines.append(f"[표: {pretty_name}]")  # 이걸로 나중에 서비스에서 구분할 거임
+
+                    current_rcept = None
+                    current_note = None
 
                     for (
                         corp_name,
@@ -382,38 +392,43 @@ def load_structured_financial_texts(
                         row_idx,
                         row_json,
                     ) in rows:
-                        corp = corp_name or stock
-                        section = section_tag or pretty_name
+                        if rcept_no != current_rcept:
+                            lines.append(f"- 보고서 {rcept_no}")
+                            current_rcept = rcept_no
+                            current_note = None  # 새 보고서면 노트도 초기화
 
-                        # row_json 펼치기
+                        note_id = (note_number or "") + (note_title or "")
+                        if note_id != current_note:
+                            # 주석 헤더
+                            title_part = ""
+                            if note_number:
+                                title_part = f"주석 {note_number}"
+                            if note_title:
+                                if title_part:
+                                    title_part += f". {note_title}"
+                                else:
+                                    title_part = note_title
+                            lines.append(f"  - {title_part}")
+                            current_note = note_id
+
+                        # 실제 행 내용 펼치기
                         try:
                             obj = json.loads(row_json)
                             vals = []
                             for k in sorted(obj.keys()):
                                 v = obj[k]
-                                if v is None or v == "":
+                                if not v:
                                     continue
                                 vals.append(str(v))
                             row_txt = " / ".join(vals)
                         except Exception:
                             row_txt = row_json or ""
 
-                        # 주석은 제목을 살려서
-                        title_part = ""
-                        if note_number:
-                            title_part = f"주석 {note_number}"
-                        if note_title:
-                            if title_part:
-                                title_part += f". {note_title}"
-                            else:
-                                title_part = note_title
-
-                        stock2lines[stock].append(
-                            f"{corp} | {section} | {title_part} | {rcept_no} | {row_txt}"
-                        )
+                        if row_txt:
+                            lines.append(f"    · {row_txt}")
 
                 else:
-                    # 나머지 일반 재무표 테이블
+                    # ───────── 일반 재무표: rcept_no 단위로 묶기 ─────────
                     cur.execute(
                         f"""
                         SELECT
@@ -424,7 +439,7 @@ def load_structured_financial_texts(
                             row_json
                         FROM {tbl}
                         WHERE stock_code=?
-                        ORDER BY row_idx ASC
+                        ORDER BY rcept_no DESC, row_idx ASC
                         """,
                         (stock,),
                     )
@@ -432,8 +447,10 @@ def load_structured_financial_texts(
                     if not rows:
                         continue
 
-                    stock2lines[stock].append(f"[표: {pretty_name}]")
+                    lines = stock2lines[stock]
+                    lines.append(f"[표: {pretty_name}]")
 
+                    current_rcept = None
                     for (
                         corp_name,
                         rcept_no,
@@ -441,24 +458,24 @@ def load_structured_financial_texts(
                         row_idx,
                         row_json,
                     ) in rows:
-                        corp = corp_name or stock
-                        section = section_tag or pretty_name
+                        if rcept_no != current_rcept:
+                            lines.append(f"- 보고서 {rcept_no}")
+                            current_rcept = rcept_no
 
                         try:
                             obj = json.loads(row_json)
                             vals = []
                             for k in sorted(obj.keys()):
                                 v = obj[k]
-                                if v is None or v == "":
+                                if not v:
                                     continue
                                 vals.append(str(v))
                             row_txt = " / ".join(vals)
                         except Exception:
                             row_txt = row_json or ""
 
-                        stock2lines[stock].append(
-                            f"{corp} | {section} | {rcept_no} | {row_txt}"
-                        )
+                        if row_txt:
+                            lines.append(f"  · {row_txt}")
     finally:
         conn.close()
 

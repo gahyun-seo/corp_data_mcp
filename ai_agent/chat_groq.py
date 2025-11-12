@@ -28,9 +28,7 @@ class GroqChat:
         temperature: float = 0.2,
         max_tokens: int = 512,
     ) -> str:
-        # 1차 방어선: context 너무 길면 잘라
-        if len(context) > 4000:
-            context = context[:4000]
+        if len(context) > 4000: context = context[:4000]
 
         headers = {
             "Authorization": f"Bearer {self.api_key}",
@@ -41,8 +39,7 @@ class GroqChat:
                 "role": "system",
                 "content": (
                     f"{system}\n\n"
-                    "아래 CONTEXT에서 근거를 찾아. 네가 질문에 맞게 정제해서 답해. 혹시라도 없으면 '자료에 없음'이라고 말한 후 스스로 생각해서 답해.\n"
-                    "숫자는 보고서 형식 그대로 써."
+                    "너는 기업 공시 보고서 전문가이자 비서야. 이래는 질문과 관련된 CONTEXT야. 우선 이 안에서 근거를 찾아서 답해."
                     "\n[CONTEXT]\n" + context
                 ),
             },

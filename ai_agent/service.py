@@ -8,7 +8,7 @@ from .loaders import (
     load_all_stock_codes,
     build_stockname_map,
     load_all_reports_for_stocks,
-    load_structured_financial_texts,  # 👈 우리가 방금 만든 함수
+    load_structured_financial_texts,
 )
 from .rag import SimpleRAG, Chunk
 from .chat_groq import GroqChat
@@ -16,27 +16,14 @@ from .chat_groq import GroqChat
 DEFAULT_DB = str(Path(__file__).resolve().parents[1] / "mcp_agent_test.db")
 
 SYSTEM_PROMPT = (
-    "너는 한국 기업의 DART 공시를 기반으로 답변하는 AI 비서야.\n\n"
-    "아래 CONTEXT에는 여러 회사의 공시에서 뽑은 '표 기반(raw) 재무데이터'와 "
-    "'보고서/첨부에서 자른 본문'이 섞여 있다.\n"
-    "표 기반 데이터는 다음과 같은 형식으로 들어온다:\n\n"
-    "너는 사용자의 질문에서\n"
-    "1) 어떤 회사(들)를 말하는지,\n"
-    "2) 어떤 표 이름을 말하는지 (예: 연결재무상태표, 연결포괄손익계산서, 연결현금흐름표, 재무제표주석),\n"
-    "3) 어떤 연도/분기/접수번호를 말하는지\n"
-    "를 먼저 파악한 뒤, CONTEXT 안에서 그에 해당하는 부분을 찾아서 설명해야 한다.\n\n"
-    "규칙:\n"
-    "- CONTEXT에 전혀 없는 표/주석/연도라면 '자료에 없음'이라고 먼저 말하고, "
-    "그 다음에 일반적인 회계 설명을 짧게 덧붙여라.\n"
-    "- 숫자는 가능하면 CONTEXT 그대로 써라. 모를 때는 추정하지 마라.\n"
-    "- 여러 회사가 CONTEXT에 있으면, 사용자가 말한 회사 것을 먼저 설명하고, "
-    "필요하면 다른 회사와 비교해도 된다.\n\n"
-    "비서 말투로, 요약, 근거가 된 내용, 해석/의견. 필요한 내용들만 간결하고 친절하게 답변."
-    # "1. 요약 (한두 문장)\n"
-    # "2. 근거가 된 표/주석 이름과 주요 숫자\n"
-    # "3. (선택) 해석/의견\n"
+    "너는 기업 공시 보고서 전문가야. 사용자가 질문할 때, 회사명(예: 삼성전자, SK하이닉스)과 분석 주제(예: 재무제표, ROE, 손익, 주석 등)가 함께 들어올 수 있다. "
+    "먼저 질문 속에서 회사명을 인식하고, 해당 회사의 자료를 CONTEXT에서 사용해 답해. "
+    "사용자가 '비교', '분기별', '최근 연도', '투자 관점', '의견', '전략' 같은 말을 하면, CONTEXT 안에 있는 여러 행을 서로 비교하고 스스로 분석해 "
+    "추세/증가감소/수익성/안정성 관점으로 2줄 정도 해석을 덧붙여줘.\n"
+    "숫자만 나열하지 말고, 숫자/표가 말해주는 방향성을 간결하게 정리해."
+    "질문에서 회사명이 여러 개면 각각의 정보를 비교해서 요약해. "
+    "단, CONTEXT 안에서 근거를 찾지 못하면 '자료에 없음'이라고 말한 뒤, 일반적인 답을 해."
 )
-
 
 class AgentState:
     def __init__(
@@ -54,10 +41,10 @@ class AgentState:
         self.max_reports_per_stock = max_reports_per_stock
         self.rag_mode = rag_mode
 
-        # 1) ★ 표를 텍스트로 미리 뽑아둔다 (질문마다 앞에 깔아줄 거라 RAG에는 안 넣음)
+        # 1) 표 텍스트 미리 만들기
         self.structured_text_map = load_structured_financial_texts(db_path, stocks)
 
-        # 2) 보고서/첨부는 RAG로 쓸 문서만 로드
+        # 2) 보고서/첨부는 RAG 대상으로
         if use_all_reports:
             report_docs = load_all_reports_for_stocks(
                 db_path,
@@ -71,10 +58,10 @@ class AgentState:
         if not report_docs:
             raise RuntimeError("DB에서 문서를 하나도 불러오지 못했습니다.")
 
-        # 3) 종목코드 ↔ 회사명 맵
+        # 3) 종목코드 ↔ 회사명
         self.code2name = build_stockname_map(report_docs)
 
-        # 4) RAG 인덱스 (보고서/첨부만)
+        # 4) RAG
         self.rag = SimpleRAG(
             report_docs,
             chunk_size=1000,
@@ -90,13 +77,10 @@ class AgentState:
     # ───────────────────────────────
     def guess_stocks_from_question(self, q: str) -> List[str]:
         q_low = q.lower()
-
-        # 코드가 직접 들어온 경우
         for c in self.stocks:
             if c in q:
                 return [c]
 
-        # 회사명이 들어온 경우
         hits: List[str] = []
         for code, name in self.code2name.items():
             if not name:
@@ -106,12 +90,35 @@ class AgentState:
         return hits
 
     # ───────────────────────────────
-    # 실제 답변 함수
+    # 주석 필요 여부
+    # ───────────────────────────────
+    def _needs_notes(self, question: str) -> bool:
+        q = question.lower()
+        return ("주석" in q) or ("note" in q)
+
+    def _extract_notes_block(self, text: str) -> str:
+        """전체 텍스트에서 [표: 재무제표주석] 부터만 가져온다."""
+        marker = "[표: 재무제표주석]"
+        if marker not in text:
+            return ""
+        idx = text.index(marker)
+        return text[idx:]
+
+    def _strip_notes_block(self, text: str) -> str:
+        """전체 텍스트에서 [표: 재무제표주석] 블록만 제거한다."""
+        marker = "[표: 재무제표주석]"
+        if marker not in text:
+            return text
+        before = text.split(marker)[0].rstrip()
+        return before
+
+    # ───────────────────────────────
+    # 실제 답변
     # ───────────────────────────────
     def answer(
         self,
         question: str,
-        top_k: int = 4,  # ✅ 2. 보고서 RAG는 3~4개만
+        top_k: int = 4,
         explicit_stocks: Optional[List[str]] = None,
         debug: bool = False,
     ) -> dict[str, Any]:
@@ -121,17 +128,31 @@ class AgentState:
             target_stocks = explicit_stocks
         else:
             guessed = self.guess_stocks_from_question(question)
-            target_stocks = guessed if guessed else self.stocks  # 하나도 못 찾으면 삼성+하이닉스 둘 다
+            target_stocks = guessed if guessed else self.stocks
 
-        # 2) ✅ 표 기반 컨텍스트를 종목별로 몽땅 앞에 깐다
+        want_notes = self._needs_notes(question)
+
+        # 2) 표 컨텍스트 만들기 (주석만 vs 주석 뺀 나머지)
         structured_parts: List[str] = []
         for s in target_stocks:
-            txt = self.structured_text_map.get(s)
-            if txt:
-                structured_parts.append(txt)
+            full_txt = self.structured_text_map.get(s)
+            if not full_txt:
+                continue
+
+            if want_notes:
+                # 사용자가 주석을 물었으면 주석만
+                notes_only = self._extract_notes_block(full_txt)
+                if notes_only:
+                    structured_parts.append(notes_only)
+            else:
+                # 주석 안 물었으면 주석은 떼고 보냄
+                main_only = self._strip_notes_block(full_txt)
+                if main_only:
+                    structured_parts.append(main_only)
+
         structured_ctx = "\n".join(structured_parts)
 
-        # 3) ✅ 보고서 RAG는 보조로만 몇 개
+        # 3) RAG 보조
         chunks: List[Chunk] = self.rag.retrieve(
             question,
             top_k=top_k,
@@ -141,7 +162,7 @@ class AgentState:
         )
         rag_ctx = self.rag.format_context(chunks)
 
-        # 4) ✅ LLM에는 “표 → --- → 보고서” 순서로 붙여서 보낸다
+        # 4) 최종 컨텍스트
         final_ctx = structured_ctx + "\n\n---\n\n" + rag_ctx
 
         answer_text = self.llm.ask(
@@ -164,9 +185,8 @@ class AgentState:
         }
 
 
-# 전역 싱글턴 → FastAPI에서 get_agent()만 부르면 됨
+# 싱글턴
 _agent: AgentState | None = None
-
 
 def get_agent() -> AgentState:
     global _agent

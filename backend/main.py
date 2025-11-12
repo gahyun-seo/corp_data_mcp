@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .routers import ai_agent
+from .routers import finance
 
 app = FastAPI(title="MCP Backend")
 
@@ -15,6 +16,7 @@ app.add_middleware(
 
 # 다른 기능들 라우터도 추가 가능
 app.include_router(ai_agent.router)
+app.include_router(finance.router)
 # app.include_router(users.router)
 # app.include_router(data.router)
 

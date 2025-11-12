@@ -1,2 +1,12 @@
 .env
 mcp_agent_test.db
+mcp_agent.db
+*.db
+*.pkl
+__pycache__/
+*.pyc
+*.log
+.vscode/
+.env/
+.mcp_env/
+venv/
