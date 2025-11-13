@@ -70,6 +70,84 @@ def _collect_year_rows(stock_code, corp_name, year):
             log.warning(f"finstate error {stock_code} {year} {rc}: {e}")
     return rows
 
+# collectors/financials.py
+
+def load_latest_snapshot(conn, stock_code: str, year: int | None = None) -> dict[str, float]:
+    """
+    financials 테이블에서 가장 최근 연도(FY or 지정 year) 한 번 뽑아서
+    { '자산총계': 1234..., '부채총계': ..., ... } 같은 dict로 반환
+    """
+    import pandas as pd
+
+    cur = conn.cursor()
+
+    if year is None:
+        row = cur.execute(
+            "SELECT MAX(year) FROM financials WHERE stock_code=?",
+            (stock_code,)
+        ).fetchone()
+        if not row or row[0] is None:
+            return {}
+        year = row[0]
+
+    df = pd.read_sql(
+        """
+        SELECT account_nm, amount
+        FROM financials
+        WHERE stock_code = ?
+          AND year = ?
+          AND reprt_code = '11011'      -- FY 기준 (필요하면 조정)
+          AND fs_div LIKE '%연결%'      -- 연결만 사용
+        """,
+        conn,
+        params=[stock_code, year]
+    )
+
+    snap = (
+        df.groupby("account_nm")["amount"]
+        .sum()
+        .to_dict()
+    )
+    return snap
+
+# collectors/financials.py 또는 별도 utils 쪽
+def compute_indicators_from_snapshot(snap: dict[str, float]) -> dict[str, float | None]:
+    get = lambda k: float(snap.get(k)) if k in snap else None
+
+    asset = get("자산총계")
+    debt = get("부채총계")
+    equity = get("자본총계")
+    ca = get("유동자산")
+    cl = get("유동부채")
+    ar = get("매출채권")
+    inv = get("재고자산")
+
+    revenue = get("매출액")
+    op = get("영업이익")
+    ni = get("당기순이익")
+
+    # 이자/법인세 (필요시)
+    interest = get("이자의 지급")
+    tax = get("법인세 납부액")
+
+    def safe_div(x, y):
+        return (x / y) if (x is not None and y not in (None, 0)) else None
+
+    return {
+        "roe":           safe_div(ni, equity),
+        "op_margin":     safe_div(op, revenue),
+        "ni_margin":     safe_div(ni, revenue),
+
+        "debt_ratio":    safe_div(debt, equity),
+        "current_ratio": safe_div(ca, cl),
+        "interest_cov":  safe_div(op, interest),
+
+        "asset_turnover":  safe_div(revenue, asset),
+        "equity_turnover": safe_div(revenue, equity),
+        "ar_turnover":     safe_div(revenue, ar),
+        "inv_turnover":    safe_div(revenue, inv),
+    }
+
 def fetch_and_save(conn, stock_code, corp_name, year=None):
     cur = conn.cursor()
     target_year = year or get_latest_business_year()  # year를 명시해서 호출할 예정

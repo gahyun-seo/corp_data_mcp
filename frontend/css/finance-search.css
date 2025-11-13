@@ -93,7 +93,7 @@
   display: flex;
   gap: 24px;
   width: max-content;
-  animation: ticker-move 18s linear infinite;
+  animation: ticker-move 30s linear infinite;
 }
 
 @keyframes ticker-move {
@@ -185,3 +185,28 @@
   object-fit: cover;
 }
 
+/* finance-search.css 에 추가 */
+
+.fs-card-bar {
+  position: absolute;
+  left: 20px;
+  bottom: 16px;
+  width: 60%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.fs-card-bar-inner {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #00d23f, #fb781b);
+  width: 40%; /* JS에서 실제 값으로 덮어씀 */
+}
+
+.fs-card-graph-wrap {
+  position: absolute;
+  right: 16px;
+  bottom: 12px;
+}
