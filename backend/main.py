@@ -13,6 +13,7 @@ from .routers import ai_agent, finance
 from .routers.stocks import stock_service
 from .routers.portfolio import portfolio_optimizer
 
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -213,6 +214,50 @@ def get_multiple_stocks(request: StockAddRequest):
     except Exception as e:
         logger.error(f"일괄 조회 실패: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/ticker-samples")
+def ticker_samples(limit: int = 40):
+    """
+    KOSPI200 샘플 종목들에 대해
+    - 종목명
+    - 종가
+    - 전일대비
+    - 등락률
+    - 기준일
+    을 반환해서 finance_search 티커에 쓰기 위함
+    """
+    import pandas as pd
+    from pathlib import Path
+    import random
+
+    csv_path = Path(__file__).resolve().parents[2] / "kospi200_codes.csv"
+    if not csv_path.exists():
+        raise HTTPException(status_code=500, detail=f"{csv_path} not found")
+
+    df = pd.read_csv(csv_path, dtype=str)
+    if df.empty:
+        return {"items": []}
+
+    # 너무 많으면 limit만큼 랜덤 샘플
+    codes = df["stock_code"].tolist()
+    random.shuffle(codes)
+    codes = codes[:limit]
+
+    items = []
+    for code in codes:
+        latest = stock_service.fetcher.get_latest_data(code)
+        if not latest:
+            continue
+        items.append({
+            "stock_code": latest.stock_code,
+            "stock_name": latest.stock_name,
+            "close_price": latest.close_price,
+            "change_price": latest.change_price,
+            "change_rate": latest.change_rate,
+            "as_of": latest.date,  # "YYYYMMDD"
+        })
+
+    return {"items": items}
 
 
 @app.get("/api/health")

@@ -1,5 +1,5 @@
 .agent-hero {
-  width: var(--content-width);
+  width: 100%;
   min-height: 832px;
   background: #000;
   display: flex;
@@ -8,7 +8,7 @@
 
 .agent-inner {
   width: 100%;
-  padding: 140px 140px 0 140px;
+  padding: 200px 140px 140px 140px;
   display: flex;
   flex-direction: column;
   align-items: center;

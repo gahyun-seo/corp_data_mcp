@@ -19,7 +19,7 @@
   </head>
   <body>
     <!-- 네비 -->
-    <header class="top-nav">
+    <header class="top-nav" id ="top-nav">
       <div class="nav-inner">
         <a href="index.html" class="nav-link">Home</a>
         <a href="ai_agent.html" class="nav-link">AI Agent</a>
@@ -53,7 +53,8 @@
       <section class="summary-row">
         <!-- 차트 -->
         <div class="price-chart">
-          <img src="assets/company_graph_large.png" alt="price graph" />
+          <!-- JS로 SVG 가격 그래프가 들어갈 자리 -->
+          <div id="price-chart-graph" class="price-chart-graph"></div>
         </div>
 
         <!-- 가격/수치 -->
